@@ -15,9 +15,9 @@ export class Experience {
   static instance: Experience;
   targetElement?: HTMLElement;
   state: IState = {};
-  scene?: THREE.Scene;
-  camera?: THREE.PerspectiveCamera;
-  renderer?: THREE.WebGLRenderer;
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  renderer = new THREE.WebGLRenderer();
   world?: World;
 
   constructor(_options?: IProps) {
@@ -30,9 +30,6 @@ export class Experience {
 
     this.targetElement = _options.targetElement;
     this.state = _options?.state || {};
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this.renderer = new THREE.WebGLRenderer();
 
     this.setCamera();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -41,17 +38,29 @@ export class Experience {
     this.targetElement.appendChild(this.renderer.domElement);
 
     this.update();
+
+    window.addEventListener('resize', () => {
+      this.resize();
+    });
   }
 
-  setCamera()
-  {
-    if (this.camera == null) return;
+  setCamera() {
     this.camera.position.z = 5;
   }
 
-  setWorld()
-  {
+  setWorld() {
     this.world = new World();
+  }
+
+  resize() {
+    const width = window.innerWidth
+    const height = window.innerHeight
+
+    this.camera.aspect = width / height
+    this.camera.updateProjectionMatrix()
+
+    this.renderer.setSize(width, height)
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   }
 
   update() {

@@ -7,9 +7,9 @@ type IObjects = {
 
 export class World {
   experience: Experience;
-  camera: any;
-  renderer: any;
-  scene: any;
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  renderer: THREE.WebGLRenderer;
   state: IState;
   objects: IObjects = {};
 
