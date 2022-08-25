@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
+import { IPlayerState } from './Player';
 
 export interface IState {
-  cubeColor?: THREE.Color;
+  player?: IPlayerState;
 };
 
 interface IProps extends IThree {
@@ -45,7 +46,7 @@ export class Experience {
   }
 
   setCamera() {
-    this.camera.position.z = 5;
+    this.camera.position.z = 10;
   }
 
   setWorld() {
@@ -61,6 +62,10 @@ export class Experience {
 
     this.renderer.setSize(width, height)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  }
+  
+  renderUpdate() {
+    this.renderer.render(this.scene, this.camera);
   }
 
   update() {

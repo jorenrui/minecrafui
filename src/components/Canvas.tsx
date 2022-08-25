@@ -13,14 +13,16 @@ export function Game() {
     experience.current = new Experience({
       targetElement: gameRef.current,
       state: {
-        cubeColor: color as unknown as THREE.Color,
+        player: {
+          color: color as unknown as THREE.Color,
+        },
       },
     });
   }, []);
 
   useEffect(() => {
-    if (experience.current?.world == null) return;
-    experience.current.world.updateCubeColor(color as unknown as THREE.Color);
+    if (!experience.current?.world?.player) return;
+    experience.current.world.player.setColor(color as unknown as THREE.Color);
   }, [color]);
   
   return <div ref={gameRef} id="game" />;
