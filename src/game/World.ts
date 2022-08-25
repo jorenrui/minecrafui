@@ -28,10 +28,9 @@ export class World {
   setFloor() {
     const geometry = new THREE.PlaneGeometry(10, 10);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x964B00,
+      color: 0xFED7AA,
     });
     const plane = new THREE.Mesh(geometry, material);
-    plane.rotation.x = -Math.PI * 0.25;
     this.scene.add(plane);
   }
 

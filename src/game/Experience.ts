@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
-import { IPlayerState } from './Player';
 
 export interface IState {
-  player?: IPlayerState;
+  player?: {
+    color?: THREE.Color;
+  };
 };
 
 interface IProps extends IThree {
