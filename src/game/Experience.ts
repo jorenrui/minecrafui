@@ -33,7 +33,7 @@ export class Experience {
   clock = new THREE.Clock();
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, this.width / this.height, 0.1, 1000 );
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
   world?: World;
 
   constructor(_options?: IProps) {

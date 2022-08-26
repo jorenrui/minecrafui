@@ -2,9 +2,19 @@ import * as THREE from 'three';
 import { PlayerCamera } from './core/PlayerCamera';
 import { Experience, IClockState } from './Experience';
 
+const JUMP_HEIGHT = 5;
+
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,
-  speed: 5,
+  direction: new THREE.Vector3(),
+  mass: 1,
+  speed: 50,
+  velocity: new THREE.Vector3(),
+  position: {
+    default: { x: 0, y: 1, z: 0 },
+  },
+  jumping: false,
+  falling: false,
   moving: {
     forward: false,
     backward: false,
@@ -34,7 +44,7 @@ export class Player {
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ color: this.state.color }),
     );
-    this.mesh.position.y = 1;
+    this.mesh.position.y = this.state.position.default.y;
     this.scene.add(this.mesh);
 
     this.setControls();
@@ -50,6 +60,9 @@ export class Player {
         this.state.moving.left = true;
       } else if (evt.code === 'KeyD') {
         this.state.moving.right = true;
+      } else if (evt.code === 'Space') {
+        this.state.jumping = true;
+        this.state.falling = false;
       }
     });
     
@@ -73,15 +86,45 @@ export class Player {
   }
 
   update() {
-    // Movement controls
-    if (this.state.moving.forward) {
-      this.mesh.position.z -= this.clockState.deltaTime * this.state.speed;
-    } else if (this.state.moving.backward) {
-      this.mesh.position.z += this.clockState.deltaTime * this.state.speed;
-    } else if (this.state.moving.left) {
-      this.mesh.position.x -= this.clockState.deltaTime * this.state.speed;
-    } else if (this.state.moving.right) {
-      this.mesh.position.x += this.clockState.deltaTime * this.state.speed;
+    if (!this.playerCamera.controls.isLocked) return;
+    const delta = this.clockState.deltaTime;
+
+    this.state.velocity.x -= this.state.velocity.x * 10.0 * delta;
+    this.state.velocity.z -= this.state.velocity.z * 10.0 * delta;
+
+    if (this.mesh.position.y >= JUMP_HEIGHT) {
+      this.state.falling = true;
+      this.state.jumping = false;
+    }
+
+    if (this.state.jumping) {
+      this.state.velocity.y += 15 * this.state.mass * delta;
+    } else if (this.state.falling) {
+      this.state.velocity.y -= 10 * this.state.mass * delta;
+    } else {
+      this.state.velocity.y = 0;
+    }
+
+    this.state.direction.z = Number(this.state.moving.forward) - Number(this.state.moving.backward);
+    this.state.direction.x = Number(this.state.moving.left) - Number(this.state.moving.right);
+    this.state.direction.normalize(); // this ensures consistent movements in all directions
+
+    if (this.state.moving.forward || this.state.moving.backward) {
+      this.state.velocity.z -= this.state.direction.z * this.state.speed * delta;
+      this.mesh.translateZ(- this.state.velocity.z * delta);
+    }
+
+    if (this.state.moving.left || this.state.moving.right) {
+      this.state.velocity.x -= this.state.direction.x * this.state.speed * delta;
+      this.mesh.translateX(- this.state.velocity.x * delta);
+    }
+
+    if ((this.state.falling || this.state.jumping) && this.state.velocity.y > 0) {
+      this.mesh.position.y = this.state.velocity.y;
+    } else if (this.state.falling || this.mesh.position.y !== this.state.position.default.y) {
+      this.mesh.position.y = this.state.position.default.y;
+      this.state.jumping = false;
+      this.state.falling = false
     }
 
     this.playerCamera.update();
