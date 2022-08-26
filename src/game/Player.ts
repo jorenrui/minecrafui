@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { PlayerCamera } from './core/PlayerCamera';
-import { Experience } from './Experience';
+import { Experience, IClockState } from './Experience';
 
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,
-  speed: 0.1,
+  speed: 5,
   moving: {
     forward: false,
     backward: false,
@@ -18,6 +18,7 @@ export class Player {
   experience: Experience;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
+  clockState: IClockState;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   state: IPlayerState = DEFAULT_STATE;
   playerCamera = new PlayerCamera();
@@ -26,6 +27,7 @@ export class Player {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
+    this.clockState = this.experience.state.clock;
 
     this.state = { ...DEFAULT_STATE, ...(this.experience.state.player || {})};
     this.mesh = new THREE.Mesh(
@@ -73,13 +75,13 @@ export class Player {
   update() {
     // Movement controls
     if (this.state.moving.forward) {
-      this.mesh.position.y += this.state.speed;
+      this.mesh.position.y += this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.backward) {
-      this.mesh.position.y -= this.state.speed;
+      this.mesh.position.y -= this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.left) {
-      this.mesh.position.x -= this.state.speed;
+      this.mesh.position.x -= this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.right) {
-      this.mesh.position.x += this.state.speed;
+      this.mesh.position.x += this.clockState.deltaTime * this.state.speed;
     }
 
     this.playerCamera.update();

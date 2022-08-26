@@ -2,10 +2,19 @@ import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
 
+export interface IClockState {
+  deltaTime: number;
+  previousTime: number;
+}
+
 const DEFAULT_STATE = {
   player: {
     color: 'blue' as unknown as THREE.Color,
   },
+  clock: {
+    deltaTime: 0,
+    previousTime: 0,
+  } as IClockState,
 };
 
 export type IState = typeof DEFAULT_STATE;
@@ -19,6 +28,7 @@ export class Experience {
   static instance: Experience;
   targetElement?: HTMLElement;
   state: IState = DEFAULT_STATE;
+  clock = new THREE.Clock();
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer();
@@ -63,6 +73,11 @@ export class Experience {
   }
 
   update() {
+    // Set time
+    const elapsedTime = this.clock.getElapsedTime()
+    this.state.clock.deltaTime = elapsedTime - this.state.clock.previousTime
+    this.state.clock.previousTime = elapsedTime
+
     this.world?.update();
     
     window.requestAnimationFrame(() => {
