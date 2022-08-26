@@ -34,7 +34,7 @@ export class Player {
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ color: this.state.color }),
     );
-    this.mesh.position.z = 1;
+    this.mesh.position.y = 1;
     this.scene.add(this.mesh);
 
     this.setControls();
@@ -75,9 +75,9 @@ export class Player {
   update() {
     // Movement controls
     if (this.state.moving.forward) {
-      this.mesh.position.y += this.clockState.deltaTime * this.state.speed;
+      this.mesh.position.z -= this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.backward) {
-      this.mesh.position.y -= this.clockState.deltaTime * this.state.speed;
+      this.mesh.position.z += this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.left) {
       this.mesh.position.x -= this.clockState.deltaTime * this.state.speed;
     } else if (this.state.moving.right) {

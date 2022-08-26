@@ -28,8 +28,10 @@ export class World {
     const geometry = new THREE.PlaneGeometry(10, 10);
     const material = new THREE.MeshBasicMaterial({
       color: 0xFED7AA,
+      side: THREE.DoubleSide,
     });
     const plane = new THREE.Mesh(geometry, material);
+    plane.rotation.x = Math.PI * 0.5;
     this.scene.add(plane);
   }
 
