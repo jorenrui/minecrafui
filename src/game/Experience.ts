@@ -28,9 +28,11 @@ export class Experience {
   static instance: Experience;
   targetElement?: HTMLElement;
   state: IState = DEFAULT_STATE;
+  width =  window.innerWidth;
+  height = window.innerHeight;
   clock = new THREE.Clock();
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  camera = new THREE.PerspectiveCamera( 75, this.width / this.height, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer();
   world?: World;
 
@@ -45,7 +47,7 @@ export class Experience {
     this.targetElement = _options.targetElement;
     this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(this.width, this.height);
 
     this.world = new World();
     this.targetElement.appendChild(this.renderer.domElement);
@@ -58,14 +60,11 @@ export class Experience {
   }
 
   resize() {
-    const width = window.innerWidth
-    const height = window.innerHeight
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
 
-    this.camera.aspect = width / height
-    this.camera.updateProjectionMatrix()
-
-    this.renderer.setSize(width, height)
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    this.renderer.setSize(this.width, this.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
   
   renderUpdate() {
@@ -74,14 +73,14 @@ export class Experience {
 
   update() {
     // Set time
-    const elapsedTime = this.clock.getElapsedTime()
-    this.state.clock.deltaTime = elapsedTime - this.state.clock.previousTime
-    this.state.clock.previousTime = elapsedTime
+    const elapsedTime = this.clock.getElapsedTime();
+    this.state.clock.deltaTime = elapsedTime - this.state.clock.previousTime;
+    this.state.clock.previousTime = elapsedTime;
 
     this.world?.update();
     
     window.requestAnimationFrame(() => {
-      this.update()
-    })
+      this.update();
+    });
   }
 }
