@@ -37,11 +37,6 @@ export class World {
   setPlayer() {
     this.player = new Player();
   }
-  
-  updateCubeColor(color: THREE.Color) {
-    if (!this.objects.cube) return;
-    this.renderer.render(this.scene, this.camera);
-  }
 
   update() {
     this.player?.update();
