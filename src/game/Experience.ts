@@ -2,25 +2,35 @@ import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
 
-export interface IState {
-  player?: {
-    color?: THREE.Color;
-  };
+const DEFAULT_STATE = {
+  player: {
+    color: 'blue' as unknown as THREE.Color,
+  },
+  camera: {
+    position: {
+      offset: new THREE.Vector3(0, -2, 1),
+    },
+    rotation: {
+      default: { x: 1.5, y: 0, z: 0 },
+    },
+  },
 };
+
+export type IState = typeof DEFAULT_STATE;
 
 interface IProps extends IThree {
   targetElement: HTMLElement;
-  state: IState;
+  state?: Partial<IState>;
 }
 
 export class Experience {
   static instance: Experience;
   targetElement?: HTMLElement;
-  state: IState = {};
+  state: IState = DEFAULT_STATE;
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer();
-  world?: World;
+  world!: World;
 
   constructor(_options?: IProps) {
     if(Experience.instance)
@@ -31,12 +41,12 @@ export class Experience {
       throw new Error('Target element is undefined.');
 
     this.targetElement = _options.targetElement;
-    this.state = _options?.state || {};
+    this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
     this.setCamera();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    this.setWorld();
+    this.world = new World();
     this.targetElement.appendChild(this.renderer.domElement);
 
     this.update();
@@ -47,11 +57,8 @@ export class Experience {
   }
 
   setCamera() {
-    this.camera.position.z = 10;
-  }
-
-  setWorld() {
-    this.world = new World();
+    const { x, y, z } = this.state.camera.rotation.default;
+    this.camera.rotation.set(x, y, z);
   }
 
   resize() {
@@ -70,7 +77,7 @@ export class Experience {
   }
 
   update() {
-    this.world?.update();
+    this.world.update();
     
     window.requestAnimationFrame(() => {
       this.update()

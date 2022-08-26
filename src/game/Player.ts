@@ -16,28 +16,27 @@ export type IPlayerState = typeof DEFAULT_STATE;
 export class Player {
   experience: Experience;
   scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   state: IPlayerState = DEFAULT_STATE;
 
   constructor() {
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.camera = this.experience.camera;
 
-    this.state = {
-      ...DEFAULT_STATE,
-      ...(this.experience.state.player || {}),
-    };
+    this.state = { ...DEFAULT_STATE, ...(this.experience.state.player || {})};
     this.mesh = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ color: this.state.color }),
     );
-  
+    this.mesh.position.z = 1;
     this.scene.add(this.mesh);
 
-    this.init();
+    this.setControls();
   }
 
-  init() {
+  setControls() {
     document.addEventListener('keydown', (evt) => {
       if (evt.code === 'KeyW') {
         this.state.moving.forward = true;
@@ -70,6 +69,7 @@ export class Player {
   }
 
   update() {
+    // Movement controls
     if (this.state.moving.forward) {
       this.mesh.position.y += this.state.speed;
     } else if (this.state.moving.backward) {
@@ -79,5 +79,10 @@ export class Player {
     } else if (this.state.moving.right) {
       this.mesh.position.x += this.state.speed;
     }
+
+    // Make camera follow the player
+    const playerPosition = new THREE.Vector3();
+    this.mesh.getWorldPosition(playerPosition);
+    this.camera.position.copy(playerPosition).add(this.experience.state.camera.position.offset);
   }
 }
