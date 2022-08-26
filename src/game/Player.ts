@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { PlayerCamera } from './core/PlayerCamera';
 import { Experience } from './Experience';
 
 const DEFAULT_STATE = {
@@ -19,6 +20,7 @@ export class Player {
   camera: THREE.PerspectiveCamera;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   state: IPlayerState = DEFAULT_STATE;
+  playerCamera = new PlayerCamera();
 
   constructor() {
     this.experience = new Experience();
@@ -80,9 +82,6 @@ export class Player {
       this.mesh.position.x += this.state.speed;
     }
 
-    // Make camera follow the player
-    const playerPosition = new THREE.Vector3();
-    this.mesh.getWorldPosition(playerPosition);
-    this.camera.position.copy(playerPosition).add(this.experience.state.camera.position.offset);
+    this.playerCamera.update();
   }
 }

@@ -6,14 +6,6 @@ const DEFAULT_STATE = {
   player: {
     color: 'blue' as unknown as THREE.Color,
   },
-  camera: {
-    position: {
-      offset: new THREE.Vector3(0, -2, 1),
-    },
-    rotation: {
-      default: { x: 1.5, y: 0, z: 0 },
-    },
-  },
 };
 
 export type IState = typeof DEFAULT_STATE;
@@ -30,7 +22,7 @@ export class Experience {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer();
-  world!: World;
+  world?: World;
 
   constructor(_options?: IProps) {
     if(Experience.instance)
@@ -43,7 +35,6 @@ export class Experience {
     this.targetElement = _options.targetElement;
     this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
-    this.setCamera();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     this.world = new World();
@@ -54,11 +45,6 @@ export class Experience {
     window.addEventListener('resize', () => {
       this.resize();
     });
-  }
-
-  setCamera() {
-    const { x, y, z } = this.state.camera.rotation.default;
-    this.camera.rotation.set(x, y, z);
   }
 
   resize() {
@@ -77,7 +63,7 @@ export class Experience {
   }
 
   update() {
-    this.world.update();
+    this.world?.update();
     
     window.requestAnimationFrame(() => {
       this.update()

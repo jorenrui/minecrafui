@@ -13,7 +13,7 @@ export class World {
   renderer: THREE.WebGLRenderer;
   state?: IState;
   objects: IObjects = {};
-  player?: Player;
+  player = new Player();
 
   constructor() {
     this.experience = new Experience();
@@ -22,7 +22,6 @@ export class World {
     this.scene = this.experience.scene;
 
     this.setFloor();
-    this.setPlayer();
   }
 
   setFloor() {
@@ -34,12 +33,8 @@ export class World {
     this.scene.add(plane);
   }
 
-  setPlayer() {
-    this.player = new Player();
-  }
-
   update() {
-    this.player?.update();
+    this.player.update();
     this.renderer.render(this.scene, this.camera);
   }
 }
