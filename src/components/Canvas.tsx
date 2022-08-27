@@ -22,12 +22,11 @@ export function Game() {
     });
 
     experience.current.on('loading', () => {
-      console.log('loading?');
-      setLoadingScreen({ show: true, message: 'Loading assets...' });
+      // Prevent loading for now cause it's too fast.
+      // setLoadingScreen({ show: true, message: 'Loading assets...' });
     });
     
     experience.current.on('loaded', () => {
-      console.log('loaded?');
       setLoadingScreen({ show: false, message: '' });
     });
   }, []);

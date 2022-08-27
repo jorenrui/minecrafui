@@ -86,7 +86,6 @@ export class Player {
   }
 
   update() {
-    if (!this.playerCamera.controls.isLocked) return;
     const delta = this.clockState.deltaTime;
 
     this.state.velocity.x -= this.state.velocity.x * 10.0 * delta;
