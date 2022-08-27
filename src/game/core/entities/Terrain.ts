@@ -50,13 +50,16 @@ export class Terrain {
   }
 
   removeBlock(x = 0, y = 0, z = 0) {
+    let removed = false;
     const block = this.objects.blocks[`${x}_${y}_${z}`];
 
     if (block?.mesh) {
       this.group.remove(block.mesh);
       block.mesh = undefined;
+      removed = true;
     }
 
     delete this.objects.blocks[`${x}_${y}_${z}`];
+    return removed;
   }
 }
