@@ -13,7 +13,7 @@ export class Block {
 
   experience: Experience;
   scene: THREE.Scene;
-  mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
+  mesh?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
 
   constructor(type: IBlockTypes, biome: IBiomes = 'forest') {
     this.experience = new Experience();
@@ -37,9 +37,6 @@ export class Block {
     }
 
     this.mesh = new THREE.Mesh(Block.geometry, materials);
-    this.mesh.position.y = 1;
-
-    this.scene.add(this.mesh);
   }
 
   static getMaterial(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {
