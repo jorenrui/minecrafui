@@ -6,6 +6,8 @@ import { IBiomes } from '@lib/types/biomes';
 import { IBlockTypes } from '@lib/types/blocks';
 import { BIOMES } from '@lib/constants/biomes';
 
+const TOP_LAYER = 3;
+
 export class Block {
   static geometry = new THREE.BoxGeometry(1, 1, 1);
   static materials: { [type: string]: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] } = {};
@@ -19,20 +21,24 @@ export class Block {
     this.experience = new Experience();
     this.scene = this.experience.scene;
 
+    const definition = BLOCKS_ASSETS.definitions[type];
     let materials: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] = Block.materials[type];
 
     if (materials == null) {
       materials = Block.getMaterial(type, this.experience.resource!.assets.blocks);
     }
 
-    if (['grass', 'leaves_oak'].includes(type)) { // Add opacity param for transparent blocks;
+    if (definition.colorFilter) {
+      const color = BIOMES[biome].color.hasOwnProperty(definition.type) // @ts-ignore
+        ? BIOMES[biome].color[definition.type]
+        : BIOMES[biome].color.default;
+  
       if (Array.isArray(materials)) {
         materials.forEach((material, index) => {
-          // Set only the top color
-          if (index === 3 || type === 'leaves_oak') material.color.set(BIOMES[biome].color);
+          if (index === TOP_LAYER) material.color.set(color);
         });
       } else {
-        materials.color.set(BIOMES[biome].color);
+        materials.color.set(color);
       }
     }
 
@@ -45,9 +51,12 @@ export class Block {
     let bottomMaterial: THREE.MeshBasicMaterial | null = null;
     let materials: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[];
 
+    const definition = BLOCKS_ASSETS.definitions[type];
     const textures = Block.getMapTexture(type, assets);
 
-    material = new THREE.MeshBasicMaterial({ map: textures.default });
+    material = definition.transparent
+      ? new THREE.MeshBasicMaterial({ map: textures.default, alphaMap: textures.default, transparent: true, opacity: 1 })
+      : new THREE.MeshBasicMaterial({ map: textures.default });
     Block.utilMaterials[type] = material;
 
     if (textures.top || textures.bottom) {
@@ -88,7 +97,6 @@ export class Block {
   static getMapTexture(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {
     const blockType = BLOCKS_ASSETS.definitions[type];
   
-    console.log(type);
     const defaultTextureName = blockType.assets.default.split('.')[0];
     const defaultTexture = assets[defaultTextureName];
 

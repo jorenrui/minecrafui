@@ -3,7 +3,9 @@ import { IBlockTypes } from '@lib/types/blocks';
 
 export type IBlockDefinitions = {
   [key in IBlockTypes]: {
-    type: 'dirt' | 'stone' | 'wood' | 'leaves';
+    type: 'grass' | 'dirt' | 'stone' | 'wood' | 'leaves';
+    colorFilter?: boolean;
+    transparent?: boolean;
     assets: {
       default: string;
       top?: string;
@@ -25,7 +27,8 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
   path: 'assets/textures/blocks',
   definitions: {
     grass: {
-      type: 'dirt',
+      type: 'grass',
+      colorFilter: true,
       assets: {
         default: 'grass_side.png',
         top: 'grass_top.png',
@@ -54,6 +57,8 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
     },
     leaves_oak: {
       type: 'leaves',
+      colorFilter: true,
+      transparent: true,
       assets: {
         default: 'leaves_oak_opaque.png',
       },
