@@ -50,24 +50,23 @@ export class PlayerSelector {
       return;
     }
 
-    const { x, y, z} = intersects[0].object.position;
+    const normal = intersects[0].face?.normal;
+
+    const { x, y, z } = intersects[0].object.position;
     const block = world.terrain.objects.blocks[`${x}_${y}_${z}`];
     
     this.position = { x, y, z };
-    const faceIndex = intersects[0].faceIndex;
 
-    if (faceIndex) {
-      if (faceIndex > 3 && faceIndex < 6) // Top face
-        this.position.y += 1;
-      else if (faceIndex > 7 && faceIndex < 10) {
-      }
+    if (normal) {
+      this.position.x += normal.x;
+      this.position.y += normal.y;
+      this.position.z += normal.z;
     }
 
-    // console.log(world.player.mesh.position);
-    const selectedBlock = world.terrain.objects.blocks[`${x}_${this.position.y}_${this.position.z}`];
+    const selectedBlock = world.terrain.objects.blocks[`${this.position.x}_${this.position.y}_${this.position.z}`];
 
     if (block && !selectedBlock) {
-      this.mesh.position.set(x, this.position.y, z);
+      this.mesh.position.set(this.position.x, this.position.y, this.position.z);
       this.mesh.visible = true;
     }
   }
