@@ -38,25 +38,25 @@ export class Terrain {
   }
   
   placeBlock(type: IBlockTypes, x = 0, y = 0, z = 0) {
-    const existingBlock = this.objects.blocks[`${x}-${y}-${z}`];
+    const existingBlock = this.objects.blocks[`${x}_${y}_${z}`];
     if (existingBlock) return;
 
     const block = new Block(type);
     this.group.add(block.mesh!);
     block.mesh!.position.set(x, y, z);
-    this.objects.blocks[`${x}-${y}-${z}`] = block;
+    this.objects.blocks[`${x}_${y}_${z}`] = block;
 
     return block;
   }
 
   removeBlock(x = 0, y = 0, z = 0) {
-    const block = this.objects.blocks[`${x}-${y}-${z}`];
+    const block = this.objects.blocks[`${x}_${y}_${z}`];
 
     if (block?.mesh) {
       this.group.remove(block.mesh);
       block.mesh = undefined;
     }
 
-    delete this.objects.blocks[`${x}-${y}-${z}`];
+    delete this.objects.blocks[`${x}_${y}_${z}`];
   }
 }
