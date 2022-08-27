@@ -344,6 +344,11 @@
   dependencies:
     "@types/webxr" "*"
 
+"@types/tiny-async-pool@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/tiny-async-pool/-/tiny-async-pool-2.0.0.tgz#744d898af12958aefb199ab91c762464ee2b1b8d"
+  integrity sha512-GB+FG7JF6SPX9yuGmfmDTRYFMdS2Za+YiYvh6RJPfTMa0LaTDEtQ6ncw6NYrHnf9cloVJxgXd6WGRdRp54O1cQ==
+
 "@types/webxr@*":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@types/webxr/-/webxr-0.5.0.tgz#aae1cef3210d88fd4204f8c33385a0bbc4da07c9"
@@ -1086,6 +1091,11 @@ three@^0.143.0:
   version "0.143.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.143.0.tgz#1455bca132cc2b20beb7f41d313e10c29e5ed9df"
   integrity sha512-oKcAGYHhJ46TGEuHjodo2n6TY2R6lbvrkp+feKZxqsUL/WkH7GKKaeu6RHeyb2Xjfk2dPLRKLsOP0KM2VgT8Zg==
+
+tiny-async-pool@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-async-pool/-/tiny-async-pool-2.1.0.tgz#3ec126568c18a7916912fb9fbecf812337ec6b84"
+  integrity sha512-ltAHPh/9k0STRQqaoUX52NH4ZQYAJz24ZAEwf1Zm+HYg3l9OXTWeqWKyYsHu40wF/F0rxd2N2bk5sLvX2qlSvg==
 
 to-fast-properties@^2.0.0:
   version "2.0.0"

@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
+import { Resource } from './utils/Resource';
+import { ASSETS } from './assets/index';
+import EventEmitter from './utils/EventEmitter';
 
 export interface IClockState {
   deltaTime: number;
@@ -24,8 +27,9 @@ interface IProps extends IThree {
   state?: Partial<IState>;
 }
 
-export class Experience {
+export class Experience extends EventEmitter {
   static instance: Experience;
+
   targetElement?: HTMLElement;
   state: IState = DEFAULT_STATE;
   width =  window.innerWidth;
@@ -35,12 +39,14 @@ export class Experience {
   camera = new THREE.PerspectiveCamera( 75, this.width / this.height, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer({ antialias: true });
   world?: World;
+  resource?: Resource;
 
   constructor(_options?: IProps) {
     if(Experience.instance)
-      return Experience.instance
-    Experience.instance = this
-  
+      return Experience.instance;
+    super();
+    Experience.instance = this;
+    
     if (!_options || (_options && _options.targetElement == null))
       throw new Error('Target element is undefined.');
 
@@ -49,13 +55,23 @@ export class Experience {
 
     this.renderer.setSize(this.width, this.height);
 
-    this.world = new World();
+    this.resource = new Resource(ASSETS);
     this.targetElement.appendChild(this.renderer.domElement);
 
     this.update();
 
     window.addEventListener('resize', () => {
       this.resize();
+    });
+
+    this.resource.loadAssets();
+    this.resource.on('loading', (status: any) => {
+      this.trigger('loading', [status]);
+    });
+    this.resource.on('loaded', (status: any) => {
+      this.trigger('loaded', [status]);
+      console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);      
+      this.world = new World();
     });
   }
 
