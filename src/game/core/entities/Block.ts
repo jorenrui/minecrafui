@@ -25,11 +25,11 @@ export class Block {
       materials = Block.getMaterial(type, this.experience.resource!.assets.blocks);
     }
 
-    if (type === 'grass') {
+    if (['grass', 'leaves_oak'].includes(type)) { // Add opacity param for transparent blocks;
       if (Array.isArray(materials)) {
         materials.forEach((material, index) => {
           // Set only the top color
-          if (index === 3) material.color.set(BIOMES[biome].color);
+          if (index === 3 || type === 'leaves_oak') material.color.set(BIOMES[biome].color);
         });
       } else {
         materials.color.set(BIOMES[biome].color);
@@ -88,6 +88,7 @@ export class Block {
   static getMapTexture(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {
     const blockType = BLOCKS_ASSETS.definitions[type];
   
+    console.log(type);
     const defaultTextureName = blockType.assets.default.split('.')[0];
     const defaultTexture = assets[defaultTextureName];
 
