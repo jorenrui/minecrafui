@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Experience, IState } from './Experience';
-import { Player } from './Player';
+import { Player } from './core/entities/Player';
 
 type IObjects = {
   cube?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;

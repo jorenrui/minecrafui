@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { PlayerCamera } from './core/PlayerCamera';
-import { Experience, IClockState } from './Experience';
+import { PlayerCamera } from '../PlayerCamera';
+import { Experience, IClockState } from '../../Experience';
 
 const JUMP_HEIGHT = 5;
 
