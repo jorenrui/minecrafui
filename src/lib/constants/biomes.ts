@@ -3,7 +3,7 @@ export const BIOMES = {
     color: {
       default: '#98f15d', 
       grass: '#98f15d',
-      leaves: '#518032',
+      leaves: '#2a6b0e',
     },
   },
   snow: {
