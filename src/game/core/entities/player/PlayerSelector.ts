@@ -11,6 +11,7 @@ export class PlayerSelector {
   raycaster = new THREE.Raycaster();
   pointer = new THREE.Vector2();
   position = { x: 0, y: 0, z: 0 };
+  normal = { x: 0, y: 0, z: 0 };
 
   constructor() {
     this.experience = new Experience();
@@ -58,6 +59,7 @@ export class PlayerSelector {
     this.position = { x, y, z };
 
     if (normal) {
+      this.normal = { ...normal };
       this.position.x += normal.x;
       this.position.y += normal.y;
       this.position.z += normal.z;

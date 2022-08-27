@@ -1,4 +1,5 @@
 import { Experience, IClockState } from '@game/Experience';
+import { IBlockTypes } from '@lib/types/blocks';
 import { PlayerCamera } from './PlayerCamera';
 import { IPlayerState } from '../Player';
 import { PlayerSelector } from './PlayerSelector';
@@ -17,12 +18,18 @@ export class PlayerActions {
     document.addEventListener('pointerdown', (evt) => {
       if (!this.playerCamera.controls.isLocked || !this.experience.world) return;
       const { x, y, z } = this.selector.position;
+      const world = this.experience.world;
 
       if (evt.button === 0) {
-        this.experience.world.terrain.placeBlock('grass', x, y, z);
+        const random = ['grass', 'dirt', 'cobblestone', 'oak_log', 'leaves_oak'][Math.floor(Math.random() * 5)] as IBlockTypes;
+        world.terrain.placeBlock(random, x, y, z);
         this.selector.reset();
       } else if (evt.button === 2) {
-        this.experience.world.terrain.removeBlock(x, y - 1, z);
+        world.terrain.removeBlock(
+          x - this.selector.normal.x,
+          y - this.selector.normal.y,
+          z - this.selector.normal.z,
+        );
       }
     });
 
