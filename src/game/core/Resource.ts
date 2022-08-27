@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import asyncPool from "tiny-async-pool";
 
 import { IAsset } from '@game/assets';
-import EventEmitter from './EventEmitter';
+import EventEmitter from '../utils/EventEmitter';
 import { onlyUnique } from '@lib/helpers/array/onlyUnique';
 
 const LOADER_CONCURRENCY = 5;

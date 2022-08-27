@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
-import { Resource } from './utils/Resource';
+import { Resource } from './core/Resource';
 import { ASSETS } from './assets/index';
 import EventEmitter from './utils/EventEmitter';
 
