@@ -37,7 +37,7 @@ export class PlayerCamera {
   }
 
   setControls() {
-    document.addEventListener('click', () => {
+    this.experience.targetElement?.addEventListener('click', () => {
       this.controls.lock();
     });
   }

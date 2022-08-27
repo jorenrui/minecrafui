@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import Stats from 'stats.js';
+
 import { IThree } from '@lib/types/three';
 import { World } from './World';
 import { Resource } from './core/Resource';
@@ -53,9 +55,10 @@ export class Experience extends EventEmitter {
     this.targetElement = _options.targetElement;
     this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
-    this.renderer.setSize(this.width, this.height);
-
     this.resource = new Resource(ASSETS);
+    this.setStats();
+    
+    this.renderer.setSize(this.width, this.height);
     this.targetElement.appendChild(this.renderer.domElement);
 
     this.update();
@@ -73,6 +76,18 @@ export class Experience extends EventEmitter {
       console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);      
       this.world = new World();
     });
+  }
+
+  setStats() {
+    const element = document.getElementById('stats');
+    if (!element) {
+      console.error('Could not find target element for stats.');
+      return;
+    }
+
+    this.stats = new Stats();
+    this.stats.showPanel(0);
+    element.appendChild(this.stats.dom);
   }
 
   resize() {
@@ -93,7 +108,9 @@ export class Experience extends EventEmitter {
     this.state.clock.deltaTime = elapsedTime - this.state.clock.previousTime;
     this.state.clock.previousTime = elapsedTime;
 
+  	this.stats.begin();
     this.world?.update();
+  	this.stats.end();
     
     window.requestAnimationFrame(() => {
       this.update();

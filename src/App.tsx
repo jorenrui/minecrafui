@@ -11,7 +11,8 @@ function App() {
     <main className="min-h-full h-full bg-slate-900">
       <LoadingScreen />
       <div hidden={loadingScreen.show}>
-        <ColorPicker />
+        <div id="stats" className="absolute top-2 left-0" />
+        {/* <ColorPicker /> */}
         <Game />
       </div>
     </main>
