@@ -58,6 +58,7 @@ export class Experience extends EventEmitter {
     this.resource = new Resource(ASSETS);
     this.setStats();
     
+    this.scene.background = new THREE.Color( 0x7fa9ff );
     this.renderer.setSize(this.width, this.height);
     this.targetElement.appendChild(this.renderer.domElement);
 
