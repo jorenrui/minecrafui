@@ -4,10 +4,11 @@ import asyncPool from "tiny-async-pool";
 import { IAsset } from '@game/assets';
 import EventEmitter from '../utils/EventEmitter';
 import { onlyUnique } from '@lib/helpers/array/onlyUnique';
+import { IBlockTypes } from '@lib/types/blocks';
 
 const LOADER_CONCURRENCY = 5;
 
-interface IResourceAsset {
+export interface IResourceAsset {
   blocks: { [name: string]: THREE.Texture };
 }
 
@@ -38,7 +39,7 @@ export class Resource extends EventEmitter {
       for (const group of textureGroups) {
         if (group.type === 'block') {
           for (const definitionKey of Object.keys(group.definitions)) {
-            const definition = group.definitions[definitionKey];
+            const definition = group.definitions[definitionKey as IBlockTypes];
             const path = group.path;
             assets.textures.push(path + '/' + definition.assets.default);
             if (definition.assets.top) assets.textures.push(path + '/' + definition.assets.top);
@@ -70,7 +71,12 @@ export class Resource extends EventEmitter {
 
 		for await(const _ of asyncPool(LOADER_CONCURRENCY, textures, async (texture) => {
 			try {
-				this.assets.blocks[texture.name] = await texture.promise;
+        const curTexture = await texture.promise;
+        curTexture.generateMipmaps = false;
+        curTexture.minFilter = THREE.NearestFilter;
+        curTexture.magFilter = THREE.NearestFilter;
+
+				this.assets.blocks[texture.name] = curTexture;
         this.status.pending -= 1;
         this.status.loaded += 1;
 			} catch (ex) {

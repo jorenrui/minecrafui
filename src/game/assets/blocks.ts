@@ -1,13 +1,16 @@
-export interface IBlockDefinitions {
-  [key: string]: {
-    type: 'dirt' | 'stone' | 'wood' | 'leaves',
+import { IBlockTypes } from '@lib/types/blocks';
+
+
+export type IBlockDefinitions = {
+  [key in IBlockTypes]: {
+    type: 'dirt' | 'stone' | 'wood' | 'leaves';
     assets: {
       default: string;
       top?: string;
       bottom?: string;
-    },
-  }
-}
+    };
+  };
+};
 
 export interface IBlockAssetGroup {
   type: 'block';
