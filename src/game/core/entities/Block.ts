@@ -25,13 +25,15 @@ export class Block {
       materials = Block.getMaterial(type, this.experience.resource!.assets.blocks);
     }
 
-    if (Array.isArray(materials)) {
-      materials.forEach((material, index) => {
-        // Set only the top color
-        if (index === 3) material.color.set(BIOMES[biome].color);
-      });
-    } else {
-      materials.color.set(BIOMES[biome].color);
+    if (type === 'grass') {
+      if (Array.isArray(materials)) {
+        materials.forEach((material, index) => {
+          // Set only the top color
+          if (index === 3) material.color.set(BIOMES[biome].color);
+        });
+      } else {
+        materials.color.set(BIOMES[biome].color);
+      }
     }
 
     this.mesh = new THREE.Mesh(Block.geometry, materials);
