@@ -30,11 +30,6 @@ export class PlayerSelector {
 
     this.mesh.visible = false;
     this.scene.add(this.mesh);
-  
-    document.addEventListener('pointermove', (evt) => {
-      this.pointer.x = (evt.clientX / window.innerWidth) * 2 - 1;
-      this.pointer.y = - (evt.clientY / window.innerHeight) * 2 + 1;
-    });
   }
 
   reset() {
