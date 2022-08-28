@@ -130,7 +130,8 @@ export class PlayerActions {
 
     if (axis === 'z') {
       if (direction > 0) {
-        this.raycaster.front.ray.origin = position;
+        this.raycaster.front.setFromCamera(this.selector.pointer, this.camera);
+        this.raycaster.front.ray.origin.y = this.mesh.position.y;
         intersects = this.raycaster.front.intersectObjects(this.experience.world?.terrain.group.children || [], false);
       } else {
         this.raycaster.back.ray.origin = position;
