@@ -48,7 +48,7 @@ export class Player extends PlayerActions {
       new THREE.MeshBasicMaterial({ color: this.state.color }),
     );
     this.mesh.position.y = this.state.position.default.y;
-    this.scene.add(this.mesh);
+    // this.scene.add(this.mesh);
 
     this.$setControls();
   }
