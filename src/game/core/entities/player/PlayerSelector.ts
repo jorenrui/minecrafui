@@ -1,6 +1,6 @@
+import * as THREE from 'three';
 import { Experience } from '@game/Experience';
 import { IWireframeMaterial } from '@lib/types/three';
-import * as THREE from 'three';
 import { Block } from '../Block';
 
 export class PlayerSelector {
@@ -17,6 +17,8 @@ export class PlayerSelector {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
+
+    this.raycaster.far = 6;
 
     const wireframe = new THREE.WireframeGeometry(Block.geometry);
     this.mesh = new THREE.LineSegments(wireframe);
@@ -44,7 +46,7 @@ export class PlayerSelector {
     const world = this.experience.world;
   	this.raycaster.setFromCamera(this.pointer, this.camera);
     
-  	const intersects = this.raycaster.intersectObjects(world.terrain.group.children);
+  	const intersects = this.raycaster.intersectObjects(world.terrain.group.children, false);
     
     if (intersects.length === 0) {
       this.mesh.visible = false;
