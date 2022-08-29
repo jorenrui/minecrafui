@@ -45,6 +45,11 @@ export class Physics {
     this.world.defaultContactMaterial.contactEquationStiffness = 1e7;
     this.world.defaultContactMaterial.contactEquationRelaxation = 4;
 
+    const playerDefaultContactMaterial = new CANNON.ContactMaterial(this.materials.default, this.materials.player, {
+      friction: 0.0,
+      restitution: 0.3,
+    });
+    this.world.addContactMaterial(playerDefaultContactMaterial);
     const playerGroundContactMaterial = new CANNON.ContactMaterial(this.materials.ground, this.materials.player, {
       friction: 0.0,
       restitution: 0.3,

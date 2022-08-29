@@ -22,18 +22,12 @@ export class PlayerActions {
   playerCamera!: PlayerCamera;
   selector!: PlayerSelector;
   raycaster = {
-    front: new THREE.Raycaster(),
-    back: new THREE.Raycaster(),
-    left: new THREE.Raycaster(),
-    right: new THREE.Raycaster(),
+    bottom: new THREE.Raycaster(),
   };
 
   $setControls() {
-    this.raycaster.front.far = 1;
-    this.raycaster.back.far = 1;
-    this.raycaster.left.far = 1;
-    this.raycaster.right.far = 1;
-
+    this.raycaster.bottom.far = 1;
+    
     document.addEventListener('pointerdown', (evt) => {
       if (!this.playerCamera.controls.isLocked || !this.experience.world) return;
       const { x, y, z } = this.selector.position;
@@ -63,6 +57,9 @@ export class PlayerActions {
         this.state.moving.left = true;
       } else if (evt.code === 'KeyD') {
         this.state.moving.right = true;
+      } else if (evt.code === 'Space') {
+        if (!this.state.jumping) velocity.y += 5;
+        this.state.jumping = true;
       }
     });
     
@@ -89,11 +86,17 @@ export class PlayerActions {
     // Set rotation of body
     this.playerCamera.controls.getObject().getWorldQuaternion(quaternion);
     this.body.quaternion.set(0, quaternion.y, 0, quaternion.w);
+    
+    this.raycaster.bottom.ray.origin = this.mesh.position;
+    this.raycaster.bottom.ray.direction.set(0, -1, 0);
+    const intersections = this.raycaster.bottom.intersectObjects( terrain.group.children, false);
 
     // Set direction
     this.state.direction.z = Number(this.state.moving.forward) - Number(this.state.moving.backward);
     this.state.direction.x = Number(this.state.moving.left) - Number(this.state.moving.right);
     this.state.direction.normalize(); // this ensures consistent movements in all directions
+
+    velocity.y -= 9.8 * this.body.mass * delta;
 
     // Set velocity based on direction
     if (this.state.moving.forward || this.state.moving.backward) {
@@ -110,9 +113,23 @@ export class PlayerActions {
       velocity.x = 0;
     }
 
-    this.body.quaternion.vmult(velocity, this.body.velocity);
-    this.body.position.y = 1;
+    if (this.state.jumping) {
+      this.mesh.position.y += velocity.y * delta;
+    }
 
+    const onObject = !!intersections[0] && this.mesh.position.y - intersections[0].object.position.y <= 1;
+  
+    if (onObject) {
+      velocity.y = 0;
+      this.mesh.position.y = intersections[0].object.position.y + 1;
+      this.state.jumping = false;
+    } else {
+      this.mesh.position.y += velocity.y * delta;
+    }
+
+    this.body.quaternion.vmult(velocity, this.body.velocity);
+    this.body.position.y = this.mesh.position.y;
+  
     this.mesh.position.copy(this.body.position as unknown as THREE.Vector3);
     this.mesh.quaternion.copy(this.body.quaternion as unknown as THREE.Quaternion);
   }

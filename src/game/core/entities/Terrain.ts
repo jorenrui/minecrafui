@@ -48,10 +48,10 @@ export class Terrain {
 
     if (body) {
       block.setBody(x, y, z);
-      this.objects.blocks[`${x}_${y}_${z}`] = block;
     }
 
     this.group.add(block.mesh);
+    this.objects.blocks[`${x}_${y}_${z}`] = block;
 
     return block;
   }

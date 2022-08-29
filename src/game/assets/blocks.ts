@@ -79,6 +79,10 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
     },
     leaves_oak: {
       type: 'leaves',
+      body: {
+        type: CANNON.Body.STATIC,
+        mass: 1,
+      },
       colorFilter: true,
       transparent: true,
       assets: {

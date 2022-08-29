@@ -6,14 +6,13 @@ import { BLOCKS_ASSETS } from '@game/assets/blocks';
 import { IBiomes } from '@lib/types/biomes';
 import { IBlockTypes } from '@lib/types/blocks';
 import { BIOMES } from '@lib/constants/biomes';
-import { Physics } from '@game/Physics';
 
 const TOP_LAYER = 3;
 
 export class Block {
   static geometry = new THREE.BoxGeometry(1, 1, 1);
   static shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
-  static mass = Physics.density * this.shape.volume();
+  static mass = 1;
   static materials: { [type: string]: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] } = {};
   static utilMaterials: { [type: string]: THREE.MeshBasicMaterial } = {};
 
@@ -55,6 +54,8 @@ export class Block {
       shape: Block.shape,
     });
   
+    this.body.collisionResponse = false;
+    this.body.fixedRotation = true;
     this.body.angularDamping = 1;
   }
 
