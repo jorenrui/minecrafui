@@ -21,6 +21,11 @@ export class World {
   }
 
   update() {
+    const delta = this.experience.state.clock.deltaTime;
+
+    if (this.player.playerCamera.controls.isLocked)
+      this.experience.physics?.world.step(1 / 60, delta, 3);
+
     this.player.update();
     this.renderer.render(this.scene, this.camera);
   }

@@ -6,6 +6,7 @@ import { World } from './World';
 import { Resource } from './core/Resource';
 import { ASSETS } from './assets/index';
 import EventEmitter from './utils/EventEmitter';
+import { Physics } from './Physics';
 
 export interface IClockState {
   deltaTime: number;
@@ -40,7 +41,9 @@ export class Experience extends EventEmitter {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, this.width / this.height, 0.1, 1000 );
   renderer = new THREE.WebGLRenderer({ antialias: true });
+  debug = false;
   world?: World;
+  physics?: Physics;
   resource?: Resource;
 
   constructor(_options?: IProps) {
@@ -55,8 +58,11 @@ export class Experience extends EventEmitter {
     this.targetElement = _options.targetElement;
     this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
-    this.resource = new Resource(ASSETS);
     this.setStats();
+    this.setDebug();
+
+    this.resource = new Resource(ASSETS);
+    this.physics = new Physics();
     
     this.scene.background = new THREE.Color( 0x7fa9ff );
     this.renderer.setSize(this.width, this.height);
@@ -77,6 +83,12 @@ export class Experience extends EventEmitter {
       console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);      
       this.world = new World();
     });
+  }
+
+  setDebug() {
+    if (!this.debug) return;
+    const axesHelper = new THREE.AxesHelper(8);
+    this.scene.add(axesHelper);
   }
 
   setStats() {
@@ -110,6 +122,7 @@ export class Experience extends EventEmitter {
     this.state.clock.previousTime = elapsedTime;
 
   	this.stats.begin();
+    this.physics?.update();
     this.world?.update();
   	this.stats.end();
     
