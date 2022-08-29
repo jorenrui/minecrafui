@@ -21,6 +21,7 @@ export class Block {
   scene: THREE.Scene;
   body: CANNON.Body;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
+  ghost = true;
 
   constructor(type: IBlockTypes, biome: IBiomes = 'forest') {
     this.experience = new Experience();
@@ -57,6 +58,7 @@ export class Block {
   }
 
   setBody(x = 0, y = 0, z = 0) {
+    this.ghost = false;
     this.body.position = new CANNON.Vec3(x, y, z);
     this.experience.physics?.world.addBody(this.body);
   }

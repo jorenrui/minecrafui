@@ -28,24 +28,24 @@ export class Terrain {
     if (!this.experience.debug)
       this.scene.add(this.group);
 
-    // this.init();
+    this.init();
   }
 
   init() {
     for (let x = -20; x < 20; x++) {
       for (let z = -20; z < 20; z++) {
-        this.placeBlock('grass', x, 0, z);
+        this.placeBlock('grass', x, 0, z, false);
       }
     }
   }
   
-  placeBlock(type: IBlockTypes, x = 0, y = 0, z = 0) {
+  placeBlock(type: IBlockTypes, x = 0, y = 0, z = 0, body = true) {
     const existingBlock = this.objects.blocks[`${x}_${y}_${z}`];
     if (existingBlock) return;
 
     const block = new Block(type);
     block.mesh.position.set(x, y, z);
-    block.setBody(x, y, z);
+    if (body) block.setBody(x, y, z);
     this.group.add(block.mesh);
     this.objects.blocks[`${x}_${y}_${z}`] = block;
 
@@ -69,8 +69,10 @@ export class Terrain {
   update() {
     for (const objectKey of Object.keys(this.objects.blocks)) {
       const block = this.objects.blocks[objectKey];
-      block.mesh.position.copy(block.body.position as unknown as THREE.Vector3);
-      block.mesh.quaternion.copy(block.body.quaternion as unknown as THREE.Quaternion);
+      if (!block.ghost) {
+        block.mesh.position.copy(block.body.position as unknown as THREE.Vector3);
+        block.mesh.quaternion.copy(block.body.quaternion as unknown as THREE.Quaternion);
+      }
     }
   }
 }
