@@ -18,13 +18,14 @@ export class Block {
 
   experience: Experience;
   scene: THREE.Scene;
-  body: CANNON.Body;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
+  type: IBlockTypes;
   ghost = true;
 
   constructor(type: IBlockTypes, biome: IBiomes = 'forest') {
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.type = type;
 
     const definition = BLOCKS_ASSETS.definitions[type];
     let materials: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] = Block.materials[type];
@@ -48,21 +49,6 @@ export class Block {
     }
 
     this.mesh = new THREE.Mesh(Block.geometry, materials);
-    this.body = new CANNON.Body({
-      type: definition.body?.type,
-      mass: definition.body?.mass ?? Block.mass,
-      shape: Block.shape,
-    });
-  
-    this.body.collisionResponse = false;
-    this.body.fixedRotation = true;
-    this.body.angularDamping = 1;
-  }
-
-  setBody(x = 0, y = 0, z = 0) {
-    this.ghost = false;
-    this.body.position = new CANNON.Vec3(x, y, z);
-    this.experience.physics?.world.addBody(this.body);
   }
 
   static getMaterial(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Experience, IState } from './Experience';
 import { Player } from './core/entities/Player';
-import { Terrain } from './core/entities/Terrain';
+import { Terrain } from './core/terrain/Terrain';
 
 export class World {
   experience: Experience;
@@ -21,13 +21,10 @@ export class World {
   }
 
   update() {
-    const delta = this.experience.state.clock.deltaTime;
-
-    if (this.player.playerCamera.controls.isLocked)
-      this.experience.physics?.world.step(1 / 60, delta, 3);
-
-    this.player.update();
     this.terrain.update();
+    this.player.update();
+    
+    this.terrain.worker.postMessage({ type: 'update' });
     this.renderer.render(this.scene, this.camera);
   }
 }

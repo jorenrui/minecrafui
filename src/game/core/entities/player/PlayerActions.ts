@@ -18,7 +18,6 @@ export class PlayerActions {
   state!: IPlayerState;
   clockState!: IClockState;
   mesh!: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
-  body!: CANNON.Body;
   playerCamera!: PlayerCamera;
   selector!: PlayerSelector;
   raycaster = {
@@ -79,24 +78,21 @@ export class PlayerActions {
   }
 
   $updateActions() {
-    const terrain = this.experience.world?.terrain;
-    if (!terrain || !this.playerCamera.controls.isLocked) return;
     const delta = this.clockState.deltaTime;
   
-    // Set rotation of body
+    // Set rotation
     this.playerCamera.controls.getObject().getWorldQuaternion(quaternion);
-    this.body.quaternion.set(0, quaternion.y, 0, quaternion.w);
     
     this.raycaster.bottom.ray.origin = this.mesh.position;
     this.raycaster.bottom.ray.direction.set(0, -1, 0);
-    const intersections = this.raycaster.bottom.intersectObjects( terrain.group.children, false);
+    const intersections = this.raycaster.bottom.intersectObjects( this.experience.world?.terrain.group.children || [], false);
 
     // Set direction
     this.state.direction.z = Number(this.state.moving.forward) - Number(this.state.moving.backward);
     this.state.direction.x = Number(this.state.moving.left) - Number(this.state.moving.right);
     this.state.direction.normalize(); // this ensures consistent movements in all directions
 
-    velocity.y -= 9.8 * this.body.mass * delta;
+    velocity.y -= 9.8 * delta;
 
     // Set velocity based on direction
     if (this.state.moving.forward || this.state.moving.backward) {
@@ -126,11 +122,23 @@ export class PlayerActions {
     } else {
       this.mesh.position.y += velocity.y * delta;
     }
-
-    this.body.quaternion.vmult(velocity, this.body.velocity);
-    this.body.position.y = this.mesh.position.y;
-  
-    this.mesh.position.copy(this.body.position as unknown as THREE.Vector3);
-    this.mesh.quaternion.copy(this.body.quaternion as unknown as THREE.Quaternion);
+    
+    this.experience.world?.terrain.worker.postMessage({
+      type: 'movePlayer',
+      payload: {
+        position: {
+          y: this.mesh.position.y,
+        },
+        velocity: {
+          x: velocity.x,
+          y: velocity.y,
+          z: velocity.z,
+        },
+        quaternion: {
+          y: quaternion.y,
+          w: quaternion.w,
+        },
+      },
+    });
   }
 }
