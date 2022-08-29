@@ -111,6 +111,7 @@ export class PlayerActions {
     }
 
     this.body.quaternion.vmult(velocity, this.body.velocity);
+    this.body.position.y = 1;
 
     this.mesh.position.copy(this.body.position as unknown as THREE.Vector3);
     this.mesh.quaternion.copy(this.body.quaternion as unknown as THREE.Quaternion);
