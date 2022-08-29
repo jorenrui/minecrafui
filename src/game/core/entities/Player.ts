@@ -55,7 +55,7 @@ export class Player extends PlayerActions {
     );
     this.mesh.position.y = this.state.position.default.y;
 
-    const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+    const shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
     this.body = new CANNON.Body({
       mass: Physics.density * shape.volume(),
       position: new CANNON.Vec3(0, this.state.position.default.y, 0),

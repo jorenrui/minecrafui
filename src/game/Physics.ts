@@ -31,6 +31,7 @@ export class Physics {
       shape: new CANNON.Plane(),
       material: this.materials.ground,
     });
+    this.ground.collisionResponse = false;
     this.ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     this.world.addBody(this.ground);
 
@@ -41,6 +42,9 @@ export class Physics {
   }
   
   $setContactMaterial() {
+    this.world.defaultContactMaterial.contactEquationStiffness = 1e7;
+    this.world.defaultContactMaterial.contactEquationRelaxation = 4;
+
     const playerGroundContactMaterial = new CANNON.ContactMaterial(this.materials.ground, this.materials.player, {
       friction: 0.0,
       restitution: 0.3,

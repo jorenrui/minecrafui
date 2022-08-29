@@ -45,9 +45,13 @@ export class Terrain {
 
     const block = new Block(type);
     block.mesh.position.set(x, y, z);
-    if (body) block.setBody(x, y, z);
+
+    if (body) {
+      block.setBody(x, y, z);
+      this.objects.blocks[`${x}_${y}_${z}`] = block;
+    }
+
     this.group.add(block.mesh);
-    this.objects.blocks[`${x}_${y}_${z}`] = block;
 
     return block;
   }
@@ -69,7 +73,17 @@ export class Terrain {
   update() {
     for (const objectKey of Object.keys(this.objects.blocks)) {
       const block = this.objects.blocks[objectKey];
+      block.body.position.x = Math.round(block.body.position.x);
+      block.body.position.y = Math.round(block.body.position.y) === 0 ? 1 : Math.round(block.body.position.y);
+      block.body.position.z = Math.round(block.body.position.z);
       if (!block.ghost) {
+        if (block.mesh.position.x !== block.body.position.x
+          || block.mesh.position.y !== block.body.position.y
+          || block.mesh.position.z !== block.body.position.z) {
+          delete this.objects.blocks[`${block.mesh.position.x}_${block.mesh.position.y}_${block.mesh.position.z}`];
+          this.objects.blocks[`${block.body.position.x}_${block.body.position.y}_${block.body.position.z}`] = block;
+        }
+
         block.mesh.position.copy(block.body.position as unknown as THREE.Vector3);
         block.mesh.quaternion.copy(block.body.quaternion as unknown as THREE.Quaternion);
       }

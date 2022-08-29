@@ -12,7 +12,7 @@ const TOP_LAYER = 3;
 
 export class Block {
   static geometry = new THREE.BoxGeometry(1, 1, 1);
-  static shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+  static shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
   static mass = Physics.density * this.shape.volume();
   static materials: { [type: string]: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] } = {};
   static utilMaterials: { [type: string]: THREE.MeshBasicMaterial } = {};
@@ -50,10 +50,11 @@ export class Block {
 
     this.mesh = new THREE.Mesh(Block.geometry, materials);
     this.body = new CANNON.Body({
-      type: CANNON.Body.STATIC,
-      mass: definition.mass ?? Block.mass,
+      type: definition.body?.type,
+      mass: definition.body?.mass ?? Block.mass,
       shape: Block.shape,
     });
+  
     this.body.angularDamping = 1;
   }
 
