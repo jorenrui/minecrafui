@@ -1,5 +1,6 @@
 
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import { Experience, IClockState } from '@game/Experience';
 import { IBlockTypes } from '@lib/types/blocks';
 import { PlayerCamera } from './PlayerCamera';
@@ -7,6 +8,8 @@ import { IPlayerState } from '../Player';
 import { PlayerSelector } from './PlayerSelector';
 
 const JUMP_HEIGHT = 5;
+const quaternion = new THREE.Quaternion();
+const velocity = new CANNON.Vec3(0, 0, 0);
 
 export class PlayerActions {
   experience!: Experience;
@@ -15,6 +18,7 @@ export class PlayerActions {
   state!: IPlayerState;
   clockState!: IClockState;
   mesh!: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+  body!: CANNON.Body;
   playerCamera!: PlayerCamera;
   selector!: PlayerSelector;
   raycaster = {
@@ -49,6 +53,8 @@ export class PlayerActions {
     });
 
     document.addEventListener('keydown', (evt) => {
+      if (!this.playerCamera.controls.isLocked) return;
+  
       if (evt.code === 'KeyW') {
         this.state.moving.forward = true;
       } else if (evt.code === 'KeyS') {
@@ -57,13 +63,12 @@ export class PlayerActions {
         this.state.moving.left = true;
       } else if (evt.code === 'KeyD') {
         this.state.moving.right = true;
-      } else if (evt.code === 'Space') {
-        this.state.jumping = true;
-        this.state.falling = false;
       }
     });
     
     document.addEventListener('keyup', (evt) => {
+      if (!this.playerCamera.controls.isLocked) return;
+
       if (evt.code === 'KeyW') {
         this.state.moving.forward = false;
       } else if (evt.code === 'KeyS') {
@@ -77,79 +82,37 @@ export class PlayerActions {
   }
 
   $updateActions() {
-    const delta = this.clockState.deltaTime;
     const terrain = this.experience.world?.terrain;
-    if (!terrain) return;
+    if (!terrain || !this.playerCamera.controls.isLocked) return;
+    const delta = this.clockState.deltaTime;
+  
+    // Set rotation of body
+    this.playerCamera.controls.getObject().getWorldQuaternion(quaternion);
+    this.body.quaternion.set(0, quaternion.y, 0, quaternion.w);
 
-    this.state.velocity.x -= this.state.velocity.x * 10.0 * delta;
-    this.state.velocity.z -= this.state.velocity.z * 10.0 * delta;
-
-    if (this.mesh.position.y >= JUMP_HEIGHT) {
-      this.state.falling = true;
-      this.state.jumping = false;
-    }
-
-    if (this.state.jumping) {
-      this.state.velocity.y += 15 * this.state.mass * delta;
-    } else if (this.state.falling) {
-      this.state.velocity.y -= 10 * this.state.mass * delta;
-    } else {
-      this.state.velocity.y = 0;
-    }
-
+    // Set direction
     this.state.direction.z = Number(this.state.moving.forward) - Number(this.state.moving.backward);
     this.state.direction.x = Number(this.state.moving.left) - Number(this.state.moving.right);
     this.state.direction.normalize(); // this ensures consistent movements in all directions
 
+    // Set velocity based on direction
     if (this.state.moving.forward || this.state.moving.backward) {
-      if (!this.$collideCheck('z', this.state.direction.z)) {
-        this.state.velocity.z -= this.state.direction.z * this.state.speed * delta;
-        this.mesh.translateZ(- this.state.velocity.z * delta);
-      }
+      this.state.velocity.z = -this.state.direction.z * this.state.speed * delta;
+      velocity.z = this.state.velocity.z;
+    } else {
+      velocity.z = 0;
     }
 
     if (this.state.moving.left || this.state.moving.right) {
-      if (!this.$collideCheck('x', this.state.direction.x)) {
-        this.state.velocity.x -= this.state.direction.x * this.state.speed * delta;
-        this.mesh.translateX(- this.state.velocity.x * delta);
-      }
+      this.state.velocity.x = -this.state.direction.x * this.state.speed * delta;
+      velocity.x = this.state.velocity.x;
+    } else {
+      velocity.x = 0;
     }
 
-    if ((this.state.falling || this.state.jumping) && this.state.velocity.y > 0) {
-      this.mesh.position.y = this.state.velocity.y;
-    } else if (this.state.falling || this.mesh.position.y !== this.state.position.default.y) {
-      this.mesh.position.y = this.state.position.default.y;
-      this.state.jumping = false;
-      this.state.falling = false
-    }
-  }
+    this.body.quaternion.vmult(velocity, this.body.velocity);
 
-  $collideCheck(axis: string, direction: number) {
-    let intersects = [];
-    const position = this.mesh.position;
-
-    if (axis === 'z') {
-      if (direction > 0) {
-        this.raycaster.front.setFromCamera(this.selector.pointer, this.camera);
-        this.raycaster.front.ray.origin.y = this.mesh.position.y;
-        intersects = this.raycaster.front.intersectObjects(this.experience.world?.terrain.group.children || [], false);
-      } else {
-        this.raycaster.back.ray.origin = position;
-        this.raycaster.back.ray.direction.set(0, 0, 1);
-        intersects = this.raycaster.back.intersectObjects(this.experience.world?.terrain.group.children || [], false);
-      }
-    } else if (axis === 'x') {
-      if (direction > 0) {
-        this.raycaster.left.ray.origin = position;
-        this.raycaster.left.ray.direction.set(-1, 0, 0);
-        intersects = this.raycaster.left.intersectObjects(this.experience.world?.terrain.group.children || [], false);
-      } else {
-        this.raycaster.right.ray.origin = position;
-        this.raycaster.right.ray.direction.set(1, 0, 0);
-        intersects = this.raycaster.right.intersectObjects(this.experience.world?.terrain.group.children || [], false);
-      }
-    }
-
-    return !!intersects.length;
+    this.mesh.position.copy(this.body.position as unknown as THREE.Vector3);
+    this.mesh.quaternion.copy(this.body.quaternion as unknown as THREE.Quaternion);
   }
 }

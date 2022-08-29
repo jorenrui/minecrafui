@@ -25,7 +25,9 @@ export class Terrain {
     this.scene = this.experience.scene;
     this.world = world;
 
-    this.scene.add(this.group);
+    if (!this.experience.debug)
+      this.scene.add(this.group);
+
     this.init();
   }
 

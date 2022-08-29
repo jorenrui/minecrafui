@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { Experience } from '@game/Experience';
+import { Player } from '../Player';
 
 const DEFAULT_STATE = {
   position: {
@@ -14,6 +15,7 @@ const DEFAULT_STATE = {
 const playerPosition = new THREE.Vector3();
 
 export class PlayerCamera {
+  player: Player;
   experience: Experience;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
@@ -21,7 +23,8 @@ export class PlayerCamera {
   state = DEFAULT_STATE;
   angle = new THREE.Vector3();
 
-  constructor() {
+  constructor(player: Player) {
+    this.player = player;
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
@@ -45,16 +48,8 @@ export class PlayerCamera {
   update() {
     if (!this.experience.world) return;
 
-    const player = this.experience.world.player.mesh;
-
-    // Rotation
-    this.camera.getWorldDirection(this.angle);
-    this.angle.y = 0;
-    this.angle.add(player.position);
-    player.lookAt(this.angle);
-
     // Follow player position
-    player.getWorldPosition(playerPosition);
+    this.player.mesh.getWorldPosition(playerPosition);
     this.camera.position.copy(playerPosition).add(this.state.position.offset);
   }
 }

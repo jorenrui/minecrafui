@@ -1,14 +1,17 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
+
 import { PlayerCamera } from './player/PlayerCamera';
 import { Experience, IClockState } from '../../Experience';
 import { PlayerActions } from './player/PlayerActions';
 import { PlayerSelector } from './player/PlayerSelector';
+import { Physics } from '@game/Physics';
 
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,
   direction: new THREE.Vector3(),
-  mass: 1,
-  speed: 50,
+  mass: 100,
+  speed: 500,
   velocity: new THREE.Vector3(),
   position: {
     default: { x: 0, y: 1, z: 0 },
@@ -30,9 +33,11 @@ export class Player extends PlayerActions {
   camera: THREE.PerspectiveCamera;
   clockState: IClockState;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+  body: CANNON.Body;
   state: IPlayerState = DEFAULT_STATE;
-  playerCamera = new PlayerCamera();
+  playerCamera = new PlayerCamera(this);
   selector = new PlayerSelector();
+  physics?: Physics;
 
   constructor() {
     super();
@@ -41,6 +46,7 @@ export class Player extends PlayerActions {
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
     this.clockState = this.experience.state.clock;
+    this.physics = this.experience.physics;
 
     this.state = { ...DEFAULT_STATE, ...(this.experience.state.player || {})};
     this.mesh = new THREE.Mesh(
@@ -48,7 +54,18 @@ export class Player extends PlayerActions {
       new THREE.MeshBasicMaterial({ color: this.state.color }),
     );
     this.mesh.position.y = this.state.position.default.y;
-    // this.scene.add(this.mesh);
+
+    const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+    this.body = new CANNON.Body({
+      mass: Physics.density * shape.volume(),
+      position: new CANNON.Vec3(0, this.state.position.default.y, 0),
+      shape,
+    });
+    this.body.angularDamping = 1;
+    this.physics?.world.addBody(this.body);
+    
+    if (!this.experience.debug)
+      this.scene.add(this.mesh);
 
     this.$setControls();
   }
