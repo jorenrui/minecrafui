@@ -27,6 +27,7 @@ export class World {
       this.experience.physics?.world.step(1 / 60, delta, 3);
 
     this.player.update();
+    this.terrain.update();
     this.renderer.render(this.scene, this.camera);
   }
 }

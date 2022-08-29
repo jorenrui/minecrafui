@@ -11,6 +11,7 @@ export class Physics {
   ground: CANNON.Body;
   debugger: any;
   materials = {
+    default: new CANNON.Material('default'),
     ground: new CANNON.Material('ground'),
     player: new CANNON.Material('player'),
   };
@@ -23,6 +24,7 @@ export class Physics {
     });
     this.world.broadphase = new CANNON.SAPBroadphase(this.world);
     this.world.allowSleep = true;
+    this.world.defaultMaterial = this.materials.default;
 
     this.ground = new CANNON.Body({
       type: CANNON.Body.STATIC,

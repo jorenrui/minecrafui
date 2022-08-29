@@ -28,7 +28,7 @@ export class Terrain {
     if (!this.experience.debug)
       this.scene.add(this.group);
 
-    this.init();
+    // this.init();
   }
 
   init() {
@@ -44,8 +44,9 @@ export class Terrain {
     if (existingBlock) return;
 
     const block = new Block(type);
-    this.group.add(block.mesh!);
-    block.mesh!.position.set(x, y, z);
+    block.mesh.position.set(x, y, z);
+    block.setBody(x, y, z);
+    this.group.add(block.mesh);
     this.objects.blocks[`${x}_${y}_${z}`] = block;
 
     return block;
@@ -57,11 +58,19 @@ export class Terrain {
 
     if (block?.mesh) {
       this.group.remove(block.mesh);
-      block.mesh = undefined;
+      this.experience.physics?.world.removeBody(block.body);
       removed = true;
     }
 
     delete this.objects.blocks[`${x}_${y}_${z}`];
     return removed;
+  }
+
+  update() {
+    for (const objectKey of Object.keys(this.objects.blocks)) {
+      const block = this.objects.blocks[objectKey];
+      block.mesh.position.copy(block.body.position as unknown as THREE.Vector3);
+      block.mesh.quaternion.copy(block.body.quaternion as unknown as THREE.Quaternion);
+    }
   }
 }

@@ -1,21 +1,26 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 
 import { Experience } from '@game/Experience';
 import { BLOCKS_ASSETS } from '@game/assets/blocks';
 import { IBiomes } from '@lib/types/biomes';
 import { IBlockTypes } from '@lib/types/blocks';
 import { BIOMES } from '@lib/constants/biomes';
+import { Physics } from '@game/Physics';
 
 const TOP_LAYER = 3;
 
 export class Block {
   static geometry = new THREE.BoxGeometry(1, 1, 1);
+  static shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+  static mass = Physics.density * this.shape.volume();
   static materials: { [type: string]: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] } = {};
   static utilMaterials: { [type: string]: THREE.MeshBasicMaterial } = {};
 
   experience: Experience;
   scene: THREE.Scene;
-  mesh?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
+  body: CANNON.Body;
+  mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
 
   constructor(type: IBlockTypes, biome: IBiomes = 'forest') {
     this.experience = new Experience();
@@ -43,6 +48,17 @@ export class Block {
     }
 
     this.mesh = new THREE.Mesh(Block.geometry, materials);
+    this.body = new CANNON.Body({
+      type: CANNON.Body.STATIC,
+      mass: definition.mass ?? Block.mass,
+      shape: Block.shape,
+    });
+    this.body.angularDamping = 1;
+  }
+
+  setBody(x = 0, y = 0, z = 0) {
+    this.body.position = new CANNON.Vec3(x, y, z);
+    this.experience.physics?.world.addBody(this.body);
   }
 
   static getMaterial(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {
