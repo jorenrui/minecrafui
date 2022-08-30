@@ -16,7 +16,7 @@ export interface IInitEvent {
 
 export interface IWorldStepEvent {
   type: MessageType.step;
-  payload: { locked: boolean; delta: number };
+  payload: { delta: number };
 }
 
 export interface IWorldUpdateEvent {

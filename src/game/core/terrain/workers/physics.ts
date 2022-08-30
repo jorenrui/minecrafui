@@ -94,8 +94,8 @@ class Physics {
     this.player.position.y = position.y;
   }
 
-  step(locked: boolean, delta: number) {
-    if (locked) this.world.step(1 / 60, delta, 3);
+  step(delta: number) {
+    this.world.step(1 / 60, delta, 3);
   }
 
   update() {
@@ -141,7 +141,7 @@ onmessage = (
       break;
     };
     case MessageType.step: {
-      physics.step(payload.locked, payload.delta);
+      physics.step(payload.delta);
       break;
     };
     case MessageType.update: {
