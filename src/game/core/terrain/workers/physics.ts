@@ -84,16 +84,6 @@ class Physics {
     delete this.blocks[id];
   }
 
-  movePlayer(
-    position: { y: number },
-    quaternion: { y: number, w: number },
-    velocity: { x: number, y: number, z: number },
-  ) {
-    this.player.quaternion.set(0, quaternion.y, 0, quaternion.w);
-    this.player.quaternion.vmult(new CANNON.Vec3(velocity.x, velocity.y, velocity.z), this.player.velocity);
-    this.player.position.y = position.y;
-  }
-
   step(delta: number) {
     this.world.step(1 / 60, delta, 3);
   }
@@ -155,10 +145,6 @@ onmessage = (
     };
     case MessageType.removeBlock: {
       physics.removeBlock(payload.id);
-      break;
-    };
-    case MessageType.movePlayer: {
-      physics.movePlayer(payload.position, payload.quaternion, payload.velocity);
       break;
     };
   }

@@ -6,7 +6,6 @@ export enum MessageType {
   update = 'update',
   buildBlock = 'buildBlock',
   removeBlock = 'removeBlock',
-  movePlayer = 'movePlayer',
 }
 
 export interface IInitEvent {
@@ -43,15 +42,6 @@ export interface IRemoveBlockEvent {
   }
 }
 
-export interface IMovePlayerEvent {
-  type: MessageType.movePlayer;
-  payload: {
-    position: { y: number };
-    quaternion: { y: number, w: number };
-    velocity: { x: number, y: number, z: number };
-  };
-}
-
-export type IMessageEvent = (IInitEvent | IWorldStepEvent | IWorldUpdateEvent | IBuildBlockEvent | IRemoveBlockEvent | IMovePlayerEvent) & {
+export type IMessageEvent = (IInitEvent | IWorldStepEvent | IWorldUpdateEvent | IBuildBlockEvent | IRemoveBlockEvent) & {
   type: MessageType;
 }

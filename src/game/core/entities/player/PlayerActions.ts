@@ -82,6 +82,7 @@ export class PlayerActions {
   
     // Set rotation
     this.playerCamera.controls.getObject().getWorldQuaternion(quaternion);
+    this.mesh.quaternion.set(0, quaternion.y, 0, quaternion.w);
     
     this.raycaster.bottom.ray.origin = this.mesh.position;
     this.raycaster.bottom.ray.direction.set(0, -1, 0);
@@ -98,6 +99,7 @@ export class PlayerActions {
     if (this.state.moving.forward || this.state.moving.backward) {
       this.state.velocity.z = -this.state.direction.z * this.state.speed * delta;
       velocity.z = this.state.velocity.z;
+      this.mesh.translateZ(velocity.z * delta);
     } else {
       velocity.z = 0;
     }
@@ -105,6 +107,7 @@ export class PlayerActions {
     if (this.state.moving.left || this.state.moving.right) {
       this.state.velocity.x = -this.state.direction.x * this.state.speed * delta;
       velocity.x = this.state.velocity.x;
+      this.mesh.translateX(velocity.x * delta);
     } else {
       velocity.x = 0;
     }
@@ -122,23 +125,5 @@ export class PlayerActions {
     } else {
       this.mesh.position.y += velocity.y * delta;
     }
-    
-    this.experience.world?.terrain.worker.postMessage({
-      type: 'movePlayer',
-      payload: {
-        position: {
-          y: this.mesh.position.y,
-        },
-        velocity: {
-          x: velocity.x,
-          y: velocity.y,
-          z: velocity.z,
-        },
-        quaternion: {
-          y: quaternion.y,
-          w: quaternion.w,
-        },
-      },
-    });
   }
 }

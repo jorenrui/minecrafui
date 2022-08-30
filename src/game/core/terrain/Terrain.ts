@@ -31,13 +31,9 @@ export class Terrain {
     this.worker.onmessage = (msg) => {
       const type = msg.data?.type;
       if (type === 'update') {
-        const player = msg.data.player;
         const positions = msg.data.positions;
         const quaternions = msg.data.quaternions;
         
-        this.world.player.mesh.position.copy(player.position as unknown as THREE.Vector3);
-        this.world.player.mesh.quaternion.copy(player.quaternion as unknown as THREE.Quaternion);
-
         for (const objectKey of Object.keys(this.objects.blocks)) {
           const block = this.objects.blocks[objectKey];
           const position = positions[block.mesh.id];
