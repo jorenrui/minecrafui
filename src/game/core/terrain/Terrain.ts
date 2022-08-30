@@ -127,8 +127,6 @@ export class Terrain {
   }
 
   update() {
-    if (!this.world.player.playerCamera.controls.isLocked) return;
-
     this.worker.postMessage({
       type: 'step',
       payload: {
