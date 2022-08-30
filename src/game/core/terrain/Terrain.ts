@@ -72,7 +72,7 @@ export class Terrain {
   init() {
     for (let x = -20; x < 20; x++) {
       for (let z = -20; z < 20; z++) {
-        this.placeBlock('grass', x, 0, z);
+        this.placeBlock('grass', x, 0, z, false);
       }
     }
   }
@@ -127,10 +127,11 @@ export class Terrain {
   }
 
   update() {
+    if (!this.world.player.playerCamera.controls.isLocked) return;
+
     this.worker.postMessage({
       type: 'step',
       payload: {
-        locked: this.world.player.playerCamera.controls.isLocked,
         delta: this.experience.state.clock.deltaTime,
       },
     });
