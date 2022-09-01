@@ -4,6 +4,7 @@ import Stats from 'stats.js';
 import { IThree } from '@lib/types/three';
 import { World } from './World';
 import { Resource } from './core/Resource';
+import { Material } from './core/Material';
 import { ASSETS } from './assets/index';
 import EventEmitter from './utils/EventEmitter';
 
@@ -77,7 +78,8 @@ export class Experience extends EventEmitter {
     });
     this.resource.on('loaded', (status: any) => {
       this.trigger('loaded', [status]);
-      console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);      
+      console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);
+      this.materials = new Material(this.resource!);
       this.world = new World();
     });
   }
