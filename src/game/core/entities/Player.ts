@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { PlayerCamera } from './player/PlayerCamera';
 import { Experience, IClockState } from '../../Experience';
-import { PlayerActions } from './player/PlayerActions';
+import { PlayerControls } from './player/PlayerControls';
 import { PlayerSelector } from './player/PlayerSelector';
 
 const DEFAULT_STATE = {
@@ -24,7 +24,7 @@ const DEFAULT_STATE = {
 };
 export type IPlayerState = typeof DEFAULT_STATE;
 
-export class Player extends PlayerActions {
+export class Player extends PlayerControls {
   experience: Experience;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
