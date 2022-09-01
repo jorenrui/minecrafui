@@ -7,7 +7,10 @@ import { IBiomes } from '@lib/types/biomes';
 import { IBlockTypes } from '@lib/types/blocks';
 import { BIOMES } from '@lib/constants/biomes';
 
-const TOP_LAYER = 3;
+const LAYERS = {
+  Top: 2,
+  Bottom: 3,
+};
 
 export class Block {
   static geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -41,7 +44,7 @@ export class Block {
   
       if (Array.isArray(materials)) {
         materials.forEach((material, index) => {
-          if (index === TOP_LAYER) material.color.set(color);
+          if (index === LAYERS.Top) material.color.set(color);
         });
       } else {
         materials.color.set(color);
@@ -112,7 +115,7 @@ export class Block {
     if (blockType.assets.top || blockType.assets.bottom) {
       const topTextureName = blockType.assets.top?.split('.')[0];
       const topTexture = topTextureName ? assets[topTextureName] : null;
-      const bottomTextureName = blockType.assets.top?.split('.')[0];
+      const bottomTextureName = blockType.assets.bottom?.split('.')[0];
       const bottomTexture = bottomTextureName ? assets[bottomTextureName] : null;
 
       return {
