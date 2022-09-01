@@ -100,7 +100,7 @@ export class PlayerControls {
     });
   }
 
-  $updateActions() {
+  updateControls(matrix: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>) {
     const delta = this.clockState.deltaTime;
   
     // Set rotation
@@ -109,7 +109,7 @@ export class PlayerControls {
     const vector = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion)
     let direction = Math.atan2(vector.x, vector.z)
 
-    this.$collisionCheck();
+    this.$collisionCheck(matrix);
 
     const rotation = Math.trunc(direction);
     let frontCollide = this.collision.front;
@@ -180,17 +180,18 @@ export class PlayerControls {
     }
   }
 
-  $collisionCheck() {
-    const objects = this.experience.world?.terrain.group.children || [];
-
-    this.$collisionCheckSide('front', objects);
-    this.$collisionCheckSide('back', objects);
-    this.$collisionCheckSide('right', objects);
-    this.$collisionCheckSide('left', objects);
-    this.$collisionCheckSide('bottom', objects);
+  $collisionCheck(matrix: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>) {
+    this.$collisionCheckSide('front', matrix);
+    this.$collisionCheckSide('back', matrix);
+    this.$collisionCheckSide('right', matrix);
+    this.$collisionCheckSide('left', matrix);
+    this.$collisionCheckSide('bottom', matrix);
   }
 
-  $collisionCheckSide(side: 'front' | 'back' | 'right' | 'left' | 'bottom', objects: THREE.Object3D<THREE.Event>[] = []) {
+  $collisionCheckSide(
+    side: 'front' | 'back' | 'right' | 'left' | 'bottom',
+    matrix: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>,
+  ) {
     let raycaster: THREE.Raycaster = this.raycaster.front;
 
     switch (side) {
@@ -226,7 +227,7 @@ export class PlayerControls {
       };
     }
     
-    const intersections = raycaster.intersectObjects(objects, false);
+    const intersections = raycaster.intersectObject(matrix);
     
     this.collision[side] = intersections.length
       ? intersections[0]

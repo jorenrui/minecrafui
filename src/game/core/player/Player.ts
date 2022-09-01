@@ -4,6 +4,8 @@ import { PlayerCamera } from './PlayerCamera';
 import { Experience, IClockState } from '../../Experience';
 import { PlayerControls } from './PlayerControls';
 import { PlayerSelector } from './PlayerSelector';
+import { BlockType } from '../terrain/BlockType';
+import { Block } from '../terrain/Block';
 
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,
@@ -23,6 +25,7 @@ const DEFAULT_STATE = {
   },
 };
 export type IPlayerState = typeof DEFAULT_STATE;
+const matrix = new THREE.Matrix4();
 
 export class Player extends PlayerControls {
   experience: Experience;
@@ -62,8 +65,28 @@ export class Player extends PlayerControls {
   }
 
   update() {
-    this.$updateActions();
+    let index = 0;
+    const positions: { [id: string]: Block } = {};
+    const collisionMatrix = new THREE.InstancedMesh(
+      BlockType.geometry,
+      new THREE.MeshBasicMaterial(),
+      600,
+    );
+
+    // Populate collision matrix with blocks
+    for (const blockKey of Object.keys(BlockType.blocks)) {
+      const block = BlockType.blocks[blockKey];
+      if (block.placed) {
+        positions[`${block.x}_${block.y}_${block.z}`] = block;
+        matrix.setPosition(block.x, block.y, block.z);
+        collisionMatrix.setMatrixAt(index++, matrix);
+      }
+    }
+
+    collisionMatrix.updateMatrix();
+
     this.playerCamera.update();
-    this.selector.update();
+    this.updateControls(collisionMatrix);
+    this.selector.update(collisionMatrix, positions);
   }
 }

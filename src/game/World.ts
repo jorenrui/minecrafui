@@ -24,8 +24,6 @@ export class World {
   update() {
     this.terrain.update();
     this.player.update();
-    
-    this.terrain.worker.postMessage({ type: 'update' });
     this.renderer.render(this.scene, this.camera);
   }
 }

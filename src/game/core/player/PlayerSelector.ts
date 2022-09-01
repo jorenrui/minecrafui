@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Experience } from '@game/Experience';
 import { IWireframeMaterial } from '@lib/types/three';
+import { BlockType } from '../terrain/BlockType';
 import { Block } from '../terrain/Block';
 
 export class PlayerSelector {
@@ -20,7 +21,7 @@ export class PlayerSelector {
 
     this.raycaster.far = 6;
 
-    const wireframe = new THREE.WireframeGeometry(Block.geometry);
+    const wireframe = new THREE.WireframeGeometry(BlockType.geometry);
     this.mesh = new THREE.LineSegments(wireframe);
     const material = this.mesh.material as IWireframeMaterial;
     material.depthTest = false;
@@ -28,7 +29,8 @@ export class PlayerSelector {
     material.transparent = true;
     material.color.set('#FFFFFF');
 
-    this.mesh.visible = false;
+    this.mesh.visible = true;
+    this.mesh.position.set(0, 2, 0);
     this.scene.add(this.mesh);
   }
 
@@ -36,35 +38,28 @@ export class PlayerSelector {
     this.mesh.visible = false;
   }
 
-  update() {
-    if (!this.experience.world) return;
-    const world = this.experience.world;
+  update(matrix: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>, positions: { [id: string]: Block }) {
   	this.raycaster.setFromCamera(this.pointer, this.camera);
-    
-  	const intersects = this.raycaster.intersectObjects(world.terrain.group.children, false);
-    
+    const intersects = this.raycaster.intersectObject(matrix);
+  
     if (intersects.length === 0) {
       this.mesh.visible = false;
       return;
     }
 
+    const instance = intersects[0];
+    this.position.x = Math.round(instance.point.x); 
+    this.position.y = Math.round(instance.point.y); 
+    this.position.z = Math.round(instance.point.z);
+
     const normal = intersects[0].face?.normal;
-
-    const { x, y, z } = intersects[0].object.position;
-    const block = world.terrain.objects.blocks[`${x}_${y}_${z}`];
-    
-    this.position = { x, y, z };
-
     if (normal) {
       this.normal = { ...normal };
-      this.position.x += normal.x;
-      this.position.y += normal.y;
-      this.position.z += normal.z;
     }
+  
+    const selectedBlock = positions[`${this.position.x}_${this.position.y}_${this.position.z}`];
 
-    const selectedBlock = world.terrain.objects.blocks[`${this.position.x}_${this.position.y}_${this.position.z}`];
-
-    if (block && !selectedBlock) {
+    if (!selectedBlock) {
       this.mesh.position.set(this.position.x, this.position.y, this.position.z);
       this.mesh.visible = true;
     }
