@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { Experience } from '@game/Experience';
-import { Player } from '../Player';
+import { Player } from './Player';
 
 const DEFAULT_STATE = {
   position: {

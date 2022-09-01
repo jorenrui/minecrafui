@@ -1,10 +1,8 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
-
 import { Experience } from '@game/Experience';
-import { BLOCKS_ASSETS } from '@game/assets/blocks';
-import { IBiomes } from '@lib/types/biomes';
 import { IBlockTypes } from '@lib/types/blocks';
+import { IBiomes } from '@lib/types/biomes';
+import { BLOCKS_ASSETS } from '@game/assets/blocks';
 import { BIOMES } from '@lib/constants/biomes';
 
 const LAYERS = {
@@ -12,31 +10,37 @@ const LAYERS = {
   Bottom: 3,
 };
 
+const dummy = new THREE.Object3D();
+
+interface IMeshes {
+  [type: string]: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
+}
+
 export class Block {
+  static meshes: IMeshes = {};
   static geometry = new THREE.BoxGeometry(1, 1, 1);
-  static shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
-  static mass = 1;
   static materials: { [type: string]: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] } = {};
   static utilMaterials: { [type: string]: THREE.MeshBasicMaterial } = {};
-
   experience: Experience;
   scene: THREE.Scene;
-  mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
   type: IBlockTypes;
-  ghost = true;
+  id: number;
+  index: number;
+  mesh: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
 
-  constructor(type: IBlockTypes, biome: IBiomes = 'forest') {
+  constructor(blockType: IBlockTypes, biome: IBiomes = 'forest', _options: { index: number, size: number }) {
     this.experience = new Experience();
     this.scene = this.experience.scene;
-    this.type = type;
-
-    const definition = BLOCKS_ASSETS.definitions[type];
-    let materials: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] = Block.materials[type];
+    this.type = blockType;
+    this.index = _options.index;
+   
+    const definition = BLOCKS_ASSETS.definitions[blockType];
+    let materials: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] = Block.materials[blockType];
 
     if (materials == null) {
-      materials = Block.getMaterial(type, this.experience.resource!.assets.blocks);
+      materials = Block.getMaterial(blockType, this.experience.resource!.assets.blocks);
     }
-
+  
     if (definition.colorFilter) {
       const color = BIOMES[biome].color.hasOwnProperty(definition.type) // @ts-ignore
         ? BIOMES[biome].color[definition.type]
@@ -51,9 +55,28 @@ export class Block {
       }
     }
 
-    this.mesh = new THREE.Mesh(Block.geometry, materials);
+    if (blockType in Block.meshes) {
+      this.mesh = Block.meshes[blockType];
+      this.mesh.instanceMatrix.updateRange = {
+        offset: 0,
+        count: this.index + 1,
+      };
+      this.mesh.instanceMatrix.needsUpdate = true;
+    } else {
+      this.mesh = new THREE.InstancedMesh(Block.geometry, materials, _options.size);
+      Block.meshes[blockType] = this.mesh;
+    }
+
+    this.id = this.mesh.id;
   }
 
+  set(x = 0, y = 0, z = 0) {
+    dummy.position.set(x, y, z);
+    dummy.updateMatrix();
+    this.mesh.setMatrixAt(this.index, dummy.matrix);
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+  
   static getMaterial(type: IBlockTypes, assets: { [name: string]: THREE.Texture }) {
     let material: THREE.MeshBasicMaterial;
     let topMaterial: THREE.MeshBasicMaterial | null = null;

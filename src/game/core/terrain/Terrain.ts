@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { World } from '@game/World';
-import { Block } from '../entities/Block';
 import { IBlockTypes } from '@lib/types/blocks';
 import { Experience } from '@game/Experience';
 import PhysicsWorker from './workers/physics?worker';
+import { Block } from './Block';
 
 type IObjects = {
   cube?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
@@ -66,36 +66,28 @@ export class Terrain {
   }
 
   init() {
+    let index = 0;
+    const size = 1600;
+
     for (let x = -20; x < 20; x++) {
       for (let z = -20; z < 20; z++) {
-        this.placeBlock('grass', x, 0, z, false);
+        this.placeBlock('grass', x, 0, z, index, size);
+        index++;
       }
     }
   }
   
-  placeBlock(type: IBlockTypes, x = 0, y = 0, z = 0, body = true) {
+  placeBlock(type: IBlockTypes, x = 0, y = 0, z = 0, index: number, size: number) {
     const existingBlock = this.objects.blocks[`${x}_${y}_${z}`];
     if (existingBlock) return;
 
-    const block = new Block(type);
-    block.mesh.position.set(x, y, z);
+    const block = new Block(type, 'forest', { index, size });
+    block.set(x, y, z);
 
-    if (body) {
-      block.ghost = !body;
-      this.worker.postMessage({
-        type: 'buildBlock',
-        payload:  {
-          id: block.mesh.id,
-          blockType: block.type,
-          x,
-          y,
-          z,
-          ghost: !body
-        },
-      });
+    if (block.index === 0) {
+      this.group.add(block.mesh);
     }
 
-    this.group.add(block.mesh);
     this.objects.blocks[`${x}_${y}_${z}`] = block;
 
     return block;
@@ -106,15 +98,7 @@ export class Terrain {
     const block = this.objects.blocks[`${x}_${y}_${z}`];
 
     if (block?.mesh) {
-      this.group.remove(block.mesh);
-      
-      if (!block.ghost) {
-        this.worker.postMessage({
-          type: 'removeBlock',
-          payload:  { id: block.mesh.id },
-        });
-      }
-      
+      // this.group.remove(block.mesh);
       removed = true;
     }
 
@@ -123,11 +107,11 @@ export class Terrain {
   }
 
   update() {
-    this.worker.postMessage({
-      type: 'step',
-      payload: {
-        delta: this.experience.state.clock.deltaTime,
-      },
-    });
+    // this.worker.postMessage({
+    //   type: 'step',
+    //   payload: {
+    //     delta: this.experience.state.clock.deltaTime,
+    //   },
+    // });
   }
 }

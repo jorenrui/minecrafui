@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Experience, IState } from './Experience';
-import { Player } from './core/entities/Player';
+import { Player } from './core/player/Player';
 import { Terrain } from './core/terrain/Terrain';
 
 export class World {
@@ -10,7 +10,7 @@ export class World {
   renderer: THREE.WebGLRenderer;
   state?: IState;
   terrain: Terrain;
-  player = new Player();
+  player: Player;
 
   constructor() {
     this.experience = new Experience();
@@ -18,6 +18,7 @@ export class World {
     this.renderer = this.experience.renderer;
     this.scene = this.experience.scene;
     this.terrain = new Terrain(this);
+    this.player = new Player();
   }
 
   update() {

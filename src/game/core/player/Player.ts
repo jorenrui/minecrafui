@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import { PlayerCamera } from './player/PlayerCamera';
+import { PlayerCamera } from './PlayerCamera';
 import { Experience, IClockState } from '../../Experience';
-import { PlayerControls } from './player/PlayerControls';
-import { PlayerSelector } from './player/PlayerSelector';
+import { PlayerControls } from './PlayerControls';
+import { PlayerSelector } from './PlayerSelector';
 
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,

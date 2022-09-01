@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Experience } from '@game/Experience';
 import { IWireframeMaterial } from '@lib/types/three';
-import { Block } from '../Block';
+import { Block } from '../terrain/Block';
 
 export class PlayerSelector {
   experience: Experience;

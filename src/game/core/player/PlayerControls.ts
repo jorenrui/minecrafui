@@ -4,7 +4,7 @@ import * as CANNON from 'cannon-es';
 import { Experience, IClockState } from '@game/Experience';
 import { IBlockTypes } from '@lib/types/blocks';
 import { PlayerCamera } from './PlayerCamera';
-import { IPlayerState } from '../Player';
+import { IPlayerState } from './Player';
 import { PlayerSelector } from './PlayerSelector';
 
 const JUMP_HEIGHT = 5;
