@@ -1,17 +1,18 @@
 import { IBlockTypes } from '@lib/types/blocks';
 
+export interface IBlock {
+  type: 'grass' | 'dirt' | 'stone' | 'wood' | 'leaves';
+  colorFilter?: boolean;
+  transparent?: boolean;
+  assets: {
+    default: string;
+    top?: string;
+    bottom?: string;
+  };
+}
 
 export type IBlockDefinitions = {
-  [key in IBlockTypes]: {
-    type: 'grass' | 'dirt' | 'stone' | 'wood' | 'leaves';
-    colorFilter?: boolean;
-    transparent?: boolean;
-    assets: {
-      default: string;
-      top?: string;
-      bottom?: string;
-    };
-  };
+  [key in IBlockTypes]: IBlock;
 };
 
 export interface IBlockAssetGroup {

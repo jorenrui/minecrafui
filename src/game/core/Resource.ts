@@ -5,22 +5,26 @@ import { IAsset } from '@game/assets';
 import EventEmitter from '../utils/EventEmitter';
 import { onlyUnique } from '@lib/helpers/array/onlyUnique';
 import { IBlockTypes } from '@lib/types/blocks';
+import { ICubeTextureDef } from '@game/assets/envMaps';
 
 const LOADER_CONCURRENCY = 5;
 
 export interface IResourceAsset {
   blocks: { [name: string]: THREE.Texture };
+  envMaps: { [name: string]: THREE.CubeTexture };
 }
 
 export class Resource extends EventEmitter {
   static loaders = {
     texture: new THREE.TextureLoader(),
+    cubeTexture: new THREE.CubeTextureLoader(),
   };
 
   status = { total: 0, pending: 0, loaded: 0 };
   rawAssets: IAsset[] = [];
   assets: IResourceAsset = {
     blocks: {},
+    envMaps: {},
   };
 
   constructor(_assets: IAsset[]) {
@@ -30,12 +34,39 @@ export class Resource extends EventEmitter {
 
   async loadAssets() {
     const textureGroups = this.rawAssets.filter((group) => group.loader === 'texture');
+    const cubeTextureGroups = this.rawAssets.filter((group) => group.loader === 'cube_texture');
+
+    const assets = {
+      textures: [] as string[],
+      cubeTextures: [] as ICubeTextureDef[]
+    };
+  
+    this.trigger('loading', [this.status]);
+
+    if (cubeTextureGroups.length) {
+      for (const group of cubeTextureGroups) {
+        if (group.type === 'env_map') {
+          group.definitions.forEach((def) => {
+            const path = group.path;
+            assets.cubeTextures.push({
+              name: def.name,
+              px: path + '/' + def.name + '/' + def.px,
+              nx: path + '/' + def.name + '/' + def.nx,
+              py: path + '/' + def.name + '/' + def.py,
+              ny: path + '/' + def.name + '/' + def.ny,
+              pz: path + '/' + def.name + '/' + def.pz,
+              nz: path + '/' + def.name + '/' + def.nz,
+            });
+          });
+        }
+      }
+      
+      this.status.total += assets.cubeTextures.length;
+      if (assets.cubeTextures.length)
+        await this.$loadCubeTextures(assets.cubeTextures);
+    }
 
     if (textureGroups.length) {
-      const assets = {
-        textures: [] as string[],
-      };
-
       for (const group of textureGroups) {
         if (group.type === 'block') {
           for (const definitionKey of Object.keys(group.definitions)) {
@@ -45,21 +76,55 @@ export class Resource extends EventEmitter {
             if (definition.assets.top) assets.textures.push(path + '/' + definition.assets.top);
             if (definition.assets.bottom) assets.textures.push(path + '/' + definition.assets.bottom);
           }
-        } 
+        }
       }
 
       assets.textures = assets.textures.filter(onlyUnique);
-      this.status.total = assets.textures.length;
-
-      this.trigger('loading', [this.status]);
+      this.status.total += assets.textures.length;
 
       if (assets.textures.length)
         await this.$loadTextures(assets.textures);
     }
+
+    this.trigger('loaded', [this.status]);
+  }
+
+  async $loadCubeTextures(assets: ICubeTextureDef[]) {
+    const maps = [] as ({ name: string; promise: Promise<THREE.CubeTexture> })[];
+
+    assets.forEach((asset) => {
+      const promise = Resource.loaders.cubeTexture.loadAsync([
+        asset.px,
+        asset.nx,
+        asset.py,
+        asset.ny,
+        asset.pz,
+        asset.nz,
+      ] as unknown as string);
+
+      maps.push({ name: asset.name, promise });
+      this.status.pending += 1;
+    });
+
+		for await(const _ of asyncPool(LOADER_CONCURRENCY, maps, async (cubeTexture) => {
+			try {
+        const curTexture = await cubeTexture.promise;
+        curTexture.encoding = THREE.sRGBEncoding
+        curTexture.minFilter = THREE.NearestFilter;
+        curTexture.magFilter = THREE.NearestFilter;
+
+				this.assets.envMaps[cubeTexture.name] = curTexture;
+        this.status.pending -= 1;
+        this.status.loaded += 1;
+			} catch (ex) {
+        console.error(`Failed to load cube texture asset: ${cubeTexture.name}.`);
+        console.error(ex);
+			}
+		}));
   }
 
   async $loadTextures(assets: string[]) {
-    const textures = [] as ({ url: string; name: string; promise:  Promise<THREE.Texture> })[];
+    const textures = [] as ({ url: string; name: string; promise: Promise<THREE.Texture> })[];
 
     assets.forEach((asset) => {
       const promise = Resource.loaders.texture.loadAsync(asset);
@@ -84,7 +149,5 @@ export class Resource extends EventEmitter {
         console.error(ex);
 			}
 		}));
-
-    this.trigger('loaded', [this.status]);
   }
 }

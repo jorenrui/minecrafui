@@ -1,12 +1,9 @@
-import { BLOCKS_ASSETS, IBlockDefinitions } from './blocks';
+import { BLOCKS_ASSETS, IBlockAssetGroup } from './blocks';
+import { ENVIRONMENT_MAPS, IEnvMapAssetGroup } from './envMaps';
 
-export interface IAsset {
-  type: 'block' | 'models',
-  loader: 'texture' | 'cube_texture',
-  path: string;
-  definitions: IBlockDefinitions;
-}
-
-export const ASSETS: IAsset[] = [
+export const ASSETS = [
   BLOCKS_ASSETS,
+  ENVIRONMENT_MAPS,
 ];
+
+export type IAsset = (IBlockAssetGroup | IEnvMapAssetGroup);

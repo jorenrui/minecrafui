@@ -79,6 +79,12 @@ export class Experience extends EventEmitter {
     this.resource.on('loaded', (status: any) => {
       this.trigger('loaded', [status]);
       console.log(`Finished loading: ${status.loaded} out of ${status.total} assets has been loaded.`);
+      const backgroundMap = this.resource?.assets.envMaps['background'];
+      if (backgroundMap) {        
+        this.scene.background = backgroundMap;
+        this.scene.environment = backgroundMap;
+      }
+
       this.materials = new Material(this.resource!);
       this.world = new World();
     });
