@@ -4,9 +4,12 @@ import { loadingScreenAtom } from '@stores/loadingScreen';
 import { Game } from '@components/Canvas';
 import { LoadingScreen } from '@components/screens/LoadingScreen';
 import { Bag } from '@components/inventory/Bag';
+import { useKeyboard } from '@lib/hooks/useKeybord';
 
 function App() {
   const loadingScreen = useAtomValue(loadingScreenAtom);
+
+  useKeyboard();
 
   return (
     <main className="min-h-full h-full bg-slate-900">

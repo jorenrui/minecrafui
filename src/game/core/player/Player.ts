@@ -6,6 +6,7 @@ import { PlayerControls } from './PlayerControls';
 import { PlayerSelector } from './PlayerSelector';
 import { BlockType } from '../terrain/BlockType';
 import { Block } from '../terrain/Block';
+import { BLOCK_TYPE } from '@lib/constants/blocks';
 
 const DEFAULT_STATE = {
   color: 'blue' as unknown as THREE.Color,
@@ -32,6 +33,7 @@ export class Player extends PlayerControls {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   clockState: IClockState;
+  playerState: { selectedBlock: BLOCK_TYPE; };
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   state: IPlayerState = DEFAULT_STATE;
   playerCamera = new PlayerCamera(this);
@@ -43,6 +45,7 @@ export class Player extends PlayerControls {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
+    this.playerState = this.experience.state.player;
     this.clockState = this.experience.state.clock;
 
     this.state = { ...DEFAULT_STATE, ...(this.experience.state.player || {})};

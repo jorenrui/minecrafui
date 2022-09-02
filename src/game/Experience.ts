@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 
 import { IThree } from '@lib/types/three';
+import { BLOCK_TYPE } from '@lib/constants/blocks';
 import { World } from './World';
 import { Resource } from './core/Resource';
 import { Material } from './core/Material';
@@ -15,7 +16,7 @@ export interface IClockState {
 
 const DEFAULT_STATE = {
   player: {
-    color: 'blue' as unknown as THREE.Color,
+    selectedBlock: BLOCK_TYPE.grass,
   },
   clock: {
     deltaTime: 0,
@@ -57,8 +58,8 @@ export class Experience extends EventEmitter {
     this.targetElement = _options.targetElement;
     this.state = { ...DEFAULT_STATE, ...(_options.state || {})};
 
-    this.setStats();
-    this.setDebug();
+    this.$setStats();
+    this.$setDebug();
 
     this.resource = new Resource(ASSETS);
     
@@ -69,7 +70,7 @@ export class Experience extends EventEmitter {
     this.update();
 
     window.addEventListener('resize', () => {
-      this.resize();
+      this.$resize();
     });
 
     this.resource.loadAssets();
@@ -90,13 +91,17 @@ export class Experience extends EventEmitter {
     });
   }
 
-  setDebug() {
+  setSelectedBlock(blockType: BLOCK_TYPE) {
+    this.state.player.selectedBlock = blockType;
+  }
+
+  $setDebug() {
     if (!this.debug) return;
     const axesHelper = new THREE.AxesHelper(8);
     this.scene.add(axesHelper);
   }
 
-  setStats() {
+  $setStats() {
     const element = document.getElementById('stats');
     if (!element) {
       console.error('Could not find target element for stats.');
@@ -108,7 +113,7 @@ export class Experience extends EventEmitter {
     element.appendChild(this.stats.dom);
   }
 
-  resize() {
+  $resize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 

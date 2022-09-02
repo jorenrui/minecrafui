@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAtom } from 'jotai';
 import { colorAtom } from '@stores/color';
 

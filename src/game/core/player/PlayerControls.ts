@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Experience, IClockState } from '@game/Experience';
 import { IBlockTypes } from '@lib/types/blocks';
+import { BLOCK_TYPE } from '@lib/constants/blocks';
 import { PlayerCamera } from './PlayerCamera';
 import { IPlayerState } from './Player';
 import { PlayerSelector } from './PlayerSelector';
@@ -27,6 +28,7 @@ export class PlayerControls {
   mesh!: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   playerCamera!: PlayerCamera;
   selector!: PlayerSelector;
+  playerState!: { selectedBlock: BLOCK_TYPE; };
   raycaster = {
     front: new THREE.Raycaster(),
     back: new THREE.Raycaster(),
@@ -55,8 +57,7 @@ export class PlayerControls {
       const world = this.experience.world;
 
       if (evt.button === 0) {
-        const random = ['grass', 'dirt', 'cobblestone', 'oak_log', 'leaves_oak'][Math.floor(Math.random() * 5)] as IBlockTypes;
-        world.terrain.placeBlock(random, x, y, z);
+        world.terrain.placeBlock(this.playerState.selectedBlock, x, y, z);
         this.selector.reset();
       } else if (evt.button === 2) {
         world.terrain.removeBlock(

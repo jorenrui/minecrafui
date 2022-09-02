@@ -513,6 +513,11 @@ csstype@^3.0.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.0.tgz#4ddcac3718d787cf9df0d1b7d15033925c8f29f2"
   integrity sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==
 
+"cva@npm:class-variance-authority":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/class-variance-authority/-/class-variance-authority-0.2.3.tgz#5559761fee5fe5e0e9ccd5137bab5efc25bc6f82"
+  integrity sha512-q3VGDidOOFp5yqNpUljA8L6N78gdOPhP5oeFJPaGRnCAPRmyAw65qo+Kw2WVfKq9uiR1de7HzlcvTN871Gks/g==
+
 debug@^4.1.0:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"

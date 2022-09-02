@@ -1,13 +1,13 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { Experience } from '@game/Experience';
-import { colorAtom } from '@stores/color';
 import { loadingScreenAtom } from '@stores/loadingScreen';
+import { selectedBlockAtom } from '@stores/inventory';
 
 export function Game() {
   const gameRef = useRef<HTMLDivElement | null>(null);
   const experience = useRef<Experience | null>(null);
-  const [color] = useAtom(colorAtom);
+  const selectedBlock = useAtomValue(selectedBlockAtom);
   const setLoadingScreen = useSetAtom(loadingScreenAtom);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export function Game() {
       targetElement: gameRef.current,
       state: {
         player: {
-          color: color as unknown as THREE.Color,
+          selectedBlock,
         },
       },
     });
@@ -32,9 +32,9 @@ export function Game() {
   }, []);
 
   useEffect(() => {
-    if (!experience.current?.world?.player) return;
-    experience.current.world.player.setColor(color as unknown as THREE.Color);
-  }, [color]);
+    if (!experience.current) return;
+    experience.current.setSelectedBlock(selectedBlock);
+  }, [selectedBlock]);
   
   return <div ref={gameRef} id="game" />;
 }
