@@ -64,7 +64,7 @@ export class Terrain {
 
   removeBlock(x = 0, y = 0, z = 0) {
     const block = BlockType.blocks[`${x}_${y}_${z}`];
-    if (!block) return;
+    if (!block?.placed) return;
     const blockType = this.blocks.find((item) => item.name === block.type);
     if (!blockType) return;
     blockType.remove(x, y, z);

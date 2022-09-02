@@ -59,7 +59,7 @@ export class PlayerSelector {
   
     const selectedBlock = positions[`${this.position.x}_${this.position.y}_${this.position.z}`];
 
-    if (!selectedBlock) {
+    if (!selectedBlock?.placed) {
       this.mesh.position.set(this.position.x, this.position.y, this.position.z);
       this.mesh.visible = true;
     }

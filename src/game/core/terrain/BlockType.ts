@@ -12,7 +12,6 @@ export class BlockType {
   name: IBlockTypes;
   mesh: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
   count = 0;
-  deletedIndices: number[] = [];
 
   constructor(blockType: IBlockTypes) {
     this.mesh = new THREE.InstancedMesh(
@@ -25,46 +24,30 @@ export class BlockType {
   }
 
   set(index: null | number = 0, x = 0, y = 0, z = 0) {
-    let curIndex = index;
-    let replaced = false;
+    let curIndex = index != null ? index : this.count;
 
-    if (curIndex == null) {
-      if (this.deletedIndices.length) {
-        replaced = true;
-        curIndex = this.deletedIndices.shift() ?? this.count;
-      } else {
-        curIndex = this.count;
-      }
-    }
-
+    dummy.scale.setScalar(1);
     dummy.position.set(x, y, z);
-    if (replaced) dummy.scale.setScalar(1);
     dummy.updateMatrix();
     this.mesh.setMatrixAt(curIndex, dummy.matrix);
-    const block = new Block(this.name, curIndex, x, y, z)
-    // const block = replaced
-    //   ? BlockType.blocks[`${x}_${y}_${z}`]
-    //   : new Block(this.name, curIndex, x, y, z)
-
+  
+    const block = new Block(this, curIndex, x, y, z);
     BlockType.blocks[`${x}_${y}_${z}`] = block;
+    this.mesh.instanceMatrix.count = this.count;
+    this.needsUpdate();
 
     this.count += 1;
-    this.needsUpdate();
     return block;
   }
 
   remove(x = 0, y = 0, z = 0) {
     const block = BlockType.blocks[`${x}_${y}_${z}`];
     if (!block) return;
-    block.placed = false;
-    block.removed = true;
-    dummy.position.set(0, 0, 0);
+    delete BlockType.blocks[`${x}_${y}_${z}`];
+  
     dummy.scale.setScalar(0);
     dummy.updateMatrix();
     this.mesh.setMatrixAt(block.index, dummy.matrix);
-    delete BlockType.blocks[`${x}_${y}_${z}`];
-    this.deletedIndices.push(block.index);
-    this.count -= 1;
     this.needsUpdate();
   }
 
