@@ -65,20 +65,8 @@ export class Terrain {
   removeBlock(x = 0, y = 0, z = 0) {
     const block = BlockType.blocks[`${x}_${y}_${z}`];
     if (!block?.placed) return;
-    const blockType = this.blocks.find((item) => item.name === block.type);
-    if (!blockType) return;
-    blockType.remove(x, y, z);
-    blockType.forceUpdate();
-    // let removed = false;
-    // const block = this.objects.blocks[`${x}_${y}_${z}`];
-
-    // if (block?.mesh) {
-    //   // this.group.remove(block.mesh);
-    //   removed = true;
-    // }
-
-    // delete this.objects.blocks[`${x}_${y}_${z}`];
-    // return removed;
+    block.blockType.remove(x, y, z);
+    block.blockType.forceUpdate();
   }
 
   update() {

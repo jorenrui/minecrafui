@@ -24,6 +24,8 @@ export class BlockType {
   }
 
   set(index: null | number = 0, x = 0, y = 0, z = 0) {
+    if (BlockType.blocks[`${x}_${y}_${z}`]) return;
+
     let curIndex = index != null ? index : this.count;
 
     dummy.scale.setScalar(1);
