@@ -1,5 +1,3 @@
-
-import * as CANNON from 'cannon-es';
 import { IBlockTypes } from '@lib/types/blocks';
 
 
@@ -8,10 +6,6 @@ export type IBlockDefinitions = {
     type: 'grass' | 'dirt' | 'stone' | 'wood' | 'leaves';
     colorFilter?: boolean;
     transparent?: boolean;
-    body?: {
-      type?: CANNON.BodyType;
-      mass?: number;
-    };
     assets: {
       default: string;
       top?: string;
@@ -35,10 +29,6 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
     grass: {
       type: 'grass',
       colorFilter: true,
-      body: {
-        type: CANNON.Body.STATIC,
-        mass: 0,
-      },
       assets: {
         default: 'grass_side.png',
         top: 'grass_top.png',
@@ -47,30 +37,18 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
     },
     dirt: {
       type: 'dirt',
-      body: {
-        type: CANNON.Body.STATIC,
-        mass: 0,
-      },
       assets: {
         default: 'dirt.png',
       }
     },
     cobblestone: {
       type: 'stone',
-      body: {
-        type: CANNON.Body.STATIC,
-        mass: 0,
-      },
       assets: {
         default: 'cobblestone.png',
       },
     },
     oak_log: {
       type: 'wood',
-      body: {
-        type: CANNON.Body.STATIC,
-        mass: 0,
-      },
       assets: {
         default: 'log_oak.png',
         top: 'log_oak_top.png',
@@ -79,10 +57,6 @@ export const BLOCKS_ASSETS: IBlockAssetGroup = {
     },
     leaves_oak: {
       type: 'leaves',
-      body: {
-        type: CANNON.Body.STATIC,
-        mass: 1,
-      },
       colorFilter: true,
       transparent: true,
       assets: {

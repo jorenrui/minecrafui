@@ -1,6 +1,5 @@
 
 import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
 import { Experience, IClockState } from '@game/Experience';
 import { IBlockTypes } from '@lib/types/blocks';
 import { PlayerCamera } from './PlayerCamera';
@@ -9,7 +8,7 @@ import { PlayerSelector } from './PlayerSelector';
 
 const JUMP_HEIGHT = 5;
 const quaternion = new THREE.Quaternion();
-const velocity = new CANNON.Vec3(0, 0, 0);
+const velocity = new THREE.Vector3(0, 0, 0);
 
 interface ICollision {
   front: THREE.Intersection<THREE.Object3D<THREE.Event>> | null;
