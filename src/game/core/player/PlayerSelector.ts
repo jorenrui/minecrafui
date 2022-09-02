@@ -4,6 +4,9 @@ import { IWireframeMaterial } from '@lib/types/three';
 import { BlockType } from '../terrain/BlockType';
 import { Block } from '../terrain/Block';
 
+const dummy = new THREE.Object3D();
+const dummyMatrix = new THREE.Matrix4();
+
 export class PlayerSelector {
   experience: Experience;
   scene: THREE.Scene;
@@ -48,13 +51,17 @@ export class PlayerSelector {
     }
 
     const instance = intersects[0];
-    this.position.x = Math.round(instance.point.x); 
-    this.position.y = Math.round(instance.point.y); 
-    this.position.z = Math.round(instance.point.z);
 
     const normal = intersects[0].face?.normal;
-    if (normal) {
+    if (instance.instanceId && normal) {
+      matrix.getMatrixAt(instance.instanceId, dummyMatrix);
+  		dummy.position.setFromMatrixPosition(dummyMatrix);
+  
       this.normal = { ...normal };
+
+      this.position.x = dummy.position.x + this.normal.x;
+      this.position.y = dummy.position.y + this.normal.y;
+      this.position.z = dummy.position.z + this.normal.z;
     }
   
     const selectedBlock = positions[`${this.position.x}_${this.position.y}_${this.position.z}`];
