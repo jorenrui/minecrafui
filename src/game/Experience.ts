@@ -103,8 +103,12 @@ export class Experience extends EventEmitter {
   }
 
   resize() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
+    
 
     this.renderer.setSize(this.width, this.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
