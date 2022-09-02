@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
-import { Game } from '@components/Canvas';
-import { ColorPicker } from '@components/ColorPicker';
+import { HiPlus } from 'react-icons/hi';
 import { loadingScreenAtom } from '@stores/loadingScreen';
+import { Game } from '@components/Canvas';
 import { LoadingScreen } from '@components/screens/LoadingScreen';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
       <LoadingScreen />
       <div hidden={loadingScreen.show}>
         <div id="stats" className="absolute top-2 left-0" />
-        {/* <ColorPicker /> */}
+        <HiPlus className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-white" />
         <Game />
       </div>
     </main>
