@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import { World } from '@game/World';
 import { IBlockTypes } from '@lib/types/blocks';
 import { Experience } from '@game/Experience';
-import PhysicsWorker from './workers/physics?worker';
-import { Block } from './Block';
 import { BLOCKS_ASSETS } from '@game/assets/blocks';
 import { BlockType } from './BlockType';
 
@@ -14,14 +12,12 @@ export class Terrain {
   group = new THREE.Group();
   assets: { [name: string]: THREE.Texture; };
   blocks: BlockType[] = [];
-  worker: Worker;
 
   constructor(world: World) {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.assets = this.experience.resource!.assets.blocks;
     this.world = world;
-    this.worker = new PhysicsWorker();
 
     if (!this.experience.debug)
       this.scene.add(this.group);
@@ -70,11 +66,5 @@ export class Terrain {
   }
 
   update() {
-    // this.worker.postMessage({
-    //   type: 'step',
-    //   payload: {
-    //     delta: this.experience.state.clock.deltaTime,
-    //   },
-    // });
   }
 }
