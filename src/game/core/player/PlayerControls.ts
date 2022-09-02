@@ -80,7 +80,10 @@ export class PlayerControls {
       } else if (evt.code === 'KeyD') {
         this.state.moving.right = true;
       } else if (evt.code === 'Space') {
-        if (!this.state.jumping) velocity.y += JUMP_HEIGHT;
+        if (!this.state.jumping) {
+          this.mesh.position.y += 0.5;
+          velocity.y += JUMP_HEIGHT
+        };
         this.state.jumping = true;
       }
     });
@@ -169,11 +172,11 @@ export class PlayerControls {
       this.mesh.position.y += velocity.y * delta;
     }
 
-    const onObject = this.collision.bottom && this.mesh.position.y - this.collision.bottom.object.position.y <= 1;
-  
+    const onObject = this.collision.bottom && this.collision.bottom.distance <= 0.5;
+
     if (onObject && this.collision.bottom) {
       velocity.y = 0;
-      this.mesh.position.y = this.collision.bottom.object.position.y + 1;
+      this.mesh.position.y = Math.round(this.mesh.position.y);
       this.state.jumping = false;
     } else {
       this.mesh.position.y += velocity.y * delta;
