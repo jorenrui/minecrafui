@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { IBlockTypes } from '@lib/types/blocks';
+import { BLOCKS_ASSETS, IBlock, IBlockBaseType } from '@game/assets/blocks';
 import { Material } from '../Material';
 import { Block } from './Block';
 
@@ -10,6 +11,7 @@ export class BlockType {
   static maxCount = 530;
   static blocks: { [id: string]: Block } = {};
   name: IBlockTypes;
+  def: IBlock;
   mesh: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
   count = 0;
 
@@ -21,6 +23,7 @@ export class BlockType {
     );
     this.name = blockType;
     this.mesh.name = blockType;
+    this.def = BLOCKS_ASSETS.definitions[blockType];
   }
 
   set(index: null | number = 0, x = 0, y = 0, z = 0) {

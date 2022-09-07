@@ -5,6 +5,7 @@ export function useMusic() {
 
   useEffect(() => {
     audio.loop = true;
+    audio.volume = 0.5;
   }, []);
 
   return audio;

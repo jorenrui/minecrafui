@@ -6,8 +6,18 @@ import EventEmitter from '../utils/EventEmitter';
 import { onlyUnique } from '@lib/helpers/array/onlyUnique';
 import { IBlockTypes } from '@lib/types/blocks';
 import { ICubeTextureDef } from '@game/assets/envMaps';
+import { ISoundDefinitions } from '@game/assets/sounds';
+import { IBlockBaseType } from '@game/assets/blocks';
 
 const LOADER_CONCURRENCY = 5;
+
+export type IResourceSound = {
+  [key in IBlockBaseType]: {
+    placed?: HTMLAudioElement[];
+    removed?: HTMLAudioElement[];
+    step?: HTMLAudioElement[];
+  }
+}
 
 export interface IResourceAsset {
   blocks: { [name: string]: THREE.Texture };
@@ -22,6 +32,13 @@ export class Resource extends EventEmitter {
 
   status = { total: 0, pending: 0, loaded: 0 };
   rawAssets: IAsset[] = [];
+  sounds: IResourceSound = {
+    grass: {},
+    leaves: {},
+    sand: {},
+    stone: {},
+    wood: {},
+  }
   assets: IResourceAsset = {
     blocks: {},
     envMaps: {},
@@ -35,8 +52,10 @@ export class Resource extends EventEmitter {
   async loadAssets() {
     const textureGroups = this.rawAssets.filter((group) => group.loader === 'texture');
     const cubeTextureGroups = this.rawAssets.filter((group) => group.loader === 'cube_texture');
+    const audioGroups = this.rawAssets.filter((group) => group.loader === 'audio');
 
     const assets = {
+      sounds: [] as string[],
       textures: [] as string[],
       cubeTextures: [] as ICubeTextureDef[]
     };
@@ -46,8 +65,9 @@ export class Resource extends EventEmitter {
     if (cubeTextureGroups.length) {
       for (const group of cubeTextureGroups) {
         if (group.type === 'env_map') {
+          const path = group.path;
+
           group.definitions.forEach((def) => {
-            const path = group.path;
             assets.cubeTextures.push({
               name: def.name,
               px: path + '/' + def.name + '/' + def.px,
@@ -69,9 +89,10 @@ export class Resource extends EventEmitter {
     if (textureGroups.length) {
       for (const group of textureGroups) {
         if (group.type === 'block') {
+          const path = group.path;
+
           for (const definitionKey of Object.keys(group.definitions)) {
             const definition = group.definitions[definitionKey as IBlockTypes];
-            const path = group.path;
             assets.textures.push(path + '/' + definition.assets.default);
             if (definition.assets.top) assets.textures.push(path + '/' + definition.assets.top);
             if (definition.assets.bottom) assets.textures.push(path + '/' + definition.assets.bottom);
@@ -84,6 +105,24 @@ export class Resource extends EventEmitter {
 
       if (assets.textures.length)
         await this.$loadTextures(assets.textures);
+    }
+    
+    if (audioGroups.length) {
+      for (const group of audioGroups) {
+        if (group.type === 'sound_effect') {
+          const path = group.path;
+
+          for (const key of Object.keys(group.definitions)) {
+            const definitionKey = key as IBlockBaseType
+            const definition = group.definitions[definitionKey];
+            this.sounds[definitionKey] = {
+              placed: definition.placed?.map((def) => new Audio(path + '/' + def)) || [],
+              removed: definition.removed?.map((def) => new Audio(path + '/' + def)) || [],
+              step: definition.step?.map((def) => new Audio(path + '/' + def)) || [],
+            };
+          }
+        }
+      }
     }
 
     this.trigger('loaded', [this.status]);

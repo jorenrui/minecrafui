@@ -3,6 +3,7 @@ import { World } from '@game/World';
 import { IBlockTypes } from '@lib/types/blocks';
 import { Experience } from '@game/Experience';
 import { BLOCKS_ASSETS } from '@game/assets/blocks';
+import { IResourceSound } from '@game/core/Resource';
 import { BlockType } from './BlockType';
 
 export class Terrain {
@@ -12,10 +13,12 @@ export class Terrain {
   group = new THREE.Group();
   assets: { [name: string]: THREE.Texture; };
   blocks: BlockType[] = [];
+  sounds: IResourceSound;
 
   constructor(world: World) {
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.sounds = this.experience.resource!.sounds;
     this.assets = this.experience.resource!.assets.blocks;
     this.world = world;
 
@@ -56,6 +59,16 @@ export class Terrain {
     if (!blockType) return;
     blockType.set(null, x, y, z);
     blockType.forceUpdate();
+    
+    const sound = this.sounds[blockType.def.type];
+    const placeSound = sound.placed?.length ? sound.placed : sound.removed;
+
+    if (placeSound?.length) {
+      const audio = placeSound[Math.floor(Math.random() * placeSound.length)];
+      audio.volume = 0.5;
+      audio.currentTime = 0;
+      audio.play();
+    }
   }
 
   removeBlock(x = 0, y = 0, z = 0) {
@@ -63,6 +76,15 @@ export class Terrain {
     if (!block?.placed) return;
     block.blockType.remove(x, y, z);
     block.blockType.forceUpdate();
+
+    const sound = this.sounds[block.blockType.def.type];
+
+    if (sound.removed?.length) {
+      const audio = sound.removed[Math.floor(Math.random() * sound.removed.length)];
+      audio.volume = 0.5;
+      audio.currentTime = 0;
+      audio.play();
+    }
   }
 
   update() {
