@@ -17,7 +17,7 @@ export function Slot({ name, selected, imageSrc, onClick }: IProps) {
       disabled={!name}
     >
       {name
-        ? <img src={imageSrc} className="h-12 w-12" alt={name} style={{ backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} />
+        ? <img src={imageSrc} className="h-12 w-12 bg-no-repeat bg-cover" alt={name} />
         : <span className="sr-only">Empty Slot</span>}
     </button>
   );
