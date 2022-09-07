@@ -10,6 +10,7 @@ Features:
 - Inventory / Block Selection with keyboard shortcuts (1-9)
 
 Stuffs needed to do:
+- Loading Screen
 - Terrain Generation
 - Infinite World
 - Inventory Modal
