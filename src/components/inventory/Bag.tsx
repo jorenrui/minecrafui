@@ -25,7 +25,9 @@ export function Bag() {
               key={blockType}
               name={blockType}
               selected={blockType === selectedBlock}
-              imageSrc={BLOCKS_ASSETS.path + '/' + block.assets.default}
+              imageSrc={BLOCKS_ASSETS.iconPath
+                ? BLOCKS_ASSETS.iconPath + '/' + block.icon
+                : BLOCKS_ASSETS.path + '/' + block.assets.default}
               onClick={() => handleSelectBlock(blockType as BLOCK_TYPE)}
             />
           );
