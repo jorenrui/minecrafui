@@ -43,6 +43,10 @@ export class PlayerCamera {
     this.experience.targetElement?.addEventListener('click', () => {
       this.controls.lock();
     });
+    
+    this.controls.addEventListener('lock', () => {
+      this.experience.trigger('lock', []);
+    });
   }
 
   update() {

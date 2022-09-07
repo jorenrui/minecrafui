@@ -3,12 +3,14 @@ import { useEffect, useRef } from 'react';
 import { Experience } from '@game/Experience';
 import { loadingScreenAtom } from '@stores/loadingScreen';
 import { selectedBlockAtom } from '@stores/inventory';
+import { useMusic } from '@lib/hooks/useMusic';
 
 export function Game() {
   const gameRef = useRef<HTMLDivElement | null>(null);
   const experience = useRef<Experience | null>(null);
   const selectedBlock = useAtomValue(selectedBlockAtom);
   const setLoadingScreen = useSetAtom(loadingScreenAtom);
+  const audio = useMusic();
 
   useEffect(() => {
     if (gameRef.current == null) return;
@@ -28,6 +30,10 @@ export function Game() {
     
     experience.current.on('loaded', () => {
       setLoadingScreen({ show: false, message: '' });
+    });
+    
+    experience.current.on('lock', () => {
+      audio.play();
     });
   }, []);
 
