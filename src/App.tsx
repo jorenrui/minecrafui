@@ -5,11 +5,13 @@ import { Game } from '@components/Canvas';
 import { LoadingScreen } from '@components/screens/LoadingScreen';
 import { Bag } from '@components/inventory/Bag';
 import { useKeyboard } from '@lib/hooks/useKeybord';
+import { useMusic } from '@lib/hooks/useMusic';
 
 function App() {
   const loadingScreen = useAtomValue(loadingScreenAtom);
 
   useKeyboard();
+  useMusic();
 
   return (
     <main className="min-h-full h-full bg-slate-900">
