@@ -1,6 +1,6 @@
 # Minecrafui
 
-A Minecraft clone that is built with ThreeJS, ReactJS and TypeScript.
+A Minecraft clone that is built with ThreeJS, ReactJS and TypeScript. Read [how I built it](https://joeylene.com/blog/2022/minecrafui).
 
 Features:
 - Place/remove block
